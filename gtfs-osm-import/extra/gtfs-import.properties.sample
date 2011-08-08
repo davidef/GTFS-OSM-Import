@@ -1,0 +1,23 @@
+#Put here the path where you exctact the gtfs zip file
+gtfs-path=/Users/davide/Documents/osm/gtfs/
+
+#Put here the path where you put the stops.osm file with data exctracted from xapi
+osm-path=/Users/davide/Documents/osm/gtfsimport/
+
+#Put here the path where generate the import .osm files
+output-path=/Users/davide/Documents/osm/gtfsimport/
+
+#Put here the path where is located the osmosis bin
+osmosis-path=/Users/davide/Documents/osm/osmosis-0.39/bin/
+
+#Put here the plugin to use to preprocess the file (if not specified no preprocessing will be done)
+plugin=it.osm.gtfs.plugins.GTTTurinPlugin
+
+#Put here the value of osm operator tag
+operator=Gruppo Torinese Trasporti
+
+#Put here the value of osm network tag
+network=Formula
+
+#Put here the tag to identify the stop imported and still not manually checked
+revisitedkey=GTT:Revised
