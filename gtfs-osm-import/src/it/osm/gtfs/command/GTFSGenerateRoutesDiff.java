@@ -102,13 +102,16 @@ public class GTFSGenerateRoutesDiff {
 			StopTimes stopOSM = r;
 			long max = Math.max(stopGTFS.getStops().size(), stopOSM.getStops().size());
 			System.out.println("Progressivo \tGTFS\tOSM");
-			for (long f = 1; f < max ; f++){
+			for (long f = 1; f <= max ; f++){
 				Stop gtfs= stopGTFS.getStops().get(new Long(f));
 				Stop osm = stopOSM.getStops().get(new Long(f));
 				System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + ((osm != null) ? osm.getCode() : "-") + ((gtfs != null) && (osm != null) &&  gtfs.getCode().equals(osm.getCode()) ? "" : "*"));
 			}
 		}
-
+		System.out.println("---");
+		System.out.println("Relation matching in OSM matched in GTFS: " + osmRelationFoundInGTFS.size());
+		System.out.println("Relation matching in OSM not matched in GTFS: " + osmRelationNotFoundInGTFS.size());
+		System.out.println("---");
 	}
 
 	private static class Affinity{
