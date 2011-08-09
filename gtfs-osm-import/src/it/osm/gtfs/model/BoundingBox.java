@@ -27,10 +27,11 @@ public class BoundingBox {
 	private Double maxLon;
 	
 	public BoundingBox(Collection<? extends Stop> stops){
-		minLat = stops.iterator().next().getLat();
-		minLon = stops.iterator().next().getLon(); 
-		maxLat = stops.iterator().next().getLat(); 
-		maxLon = stops.iterator().next().getLon();
+		Stop first = stops.iterator().next();
+		minLat = first.getLat();
+		minLon = first.getLon(); 
+		maxLat = first.getLat(); 
+		maxLon = first.getLon();
 
 		for (Stop s:stops){
 			minLat = Math.min(minLat, s.getLat());
@@ -57,9 +58,10 @@ public class BoundingBox {
 	public Element getXMLTag(IElementCreator document) {
 		Element e = document.createElement("bounds");
 		e.setAttribute("minlat", minLat.toString());
-		e.setAttribute("minLon", minLon.toString());
+		e.setAttribute("minlon", minLon.toString());
 		e.setAttribute("maxlat", maxLat.toString());
 		e.setAttribute("maxlon", maxLon.toString());
+		e.setAttribute("origin", "GTFSImport");
 		return e;
 	}
 
