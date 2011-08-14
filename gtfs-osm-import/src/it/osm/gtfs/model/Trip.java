@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.model;
 
 
@@ -22,7 +22,7 @@ public class Trip implements Comparable<Trip> {
 	private String tripID;
 	private String name;
 	private StopTimes stopTime;
-	
+
 	public Trip(String tripID, String routeID, String shapeID, String name, StopTimes stopTime) {
 		super();
 		this.routeID = routeID;
@@ -31,11 +31,11 @@ public class Trip implements Comparable<Trip> {
 		this.name = name;
 		this.stopTime = stopTime;
 	}
-	
+
 	public String getTripID() {
 		return tripID;
 	}
-	
+
 	public String getRouteID() {
 		return routeID;
 	}
@@ -43,14 +43,18 @@ public class Trip implements Comparable<Trip> {
 	public String getShapeID() {
 		return shapeID;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return ((Trip) obj).routeID.equals(routeID) && ((Trip) obj).shapeID.equals(shapeID) && ((Trip) obj).stopTime.equalsStops(stopTime);
+		Trip other = (Trip) obj;
+		return (other.routeID.equals(routeID) && 
+		        other.shapeID.equals(shapeID) && 
+		       ((other.stopTime == null && stopTime == null) || 
+		        (other.stopTime != null && other.stopTime.equalsStops(stopTime))));
 	}
 	@Override
 	public int hashCode() {
