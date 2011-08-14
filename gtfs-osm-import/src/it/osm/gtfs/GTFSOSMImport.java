@@ -104,10 +104,17 @@ public class GTFSOSMImport {
 	}
 
 	public static void main(String[] args) throws IOException, CLIException {
+		initChecks();
 		System.out.println("GTFS Import\n");
 		Shell shell = ShellFactory.createConsoleShell("GTFSImport", "", new GTFSOSMImport());
 		shell.processLine("conf");
 		shell.processLine("help");
 		shell.commandLoop();
+	}
+	
+	private static void initChecks(){
+		if (Runtime.getRuntime().maxMemory() < 1000000000){
+			throw new IllegalArgumentException("You need to configure JVM to allow al least 1GB ram usage.");
+		}
 	}
 }
