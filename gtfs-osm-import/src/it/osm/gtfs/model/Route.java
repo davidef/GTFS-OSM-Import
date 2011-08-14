@@ -21,13 +21,15 @@ public class Route {
 	private String id;
 	private String shortName;
 	private String longName;
+	private String agencyId;
 	private Set<String> shapesIDs;
 	
-	public Route(String id, String shortName, String longName) {
+	public Route(String id, String shortName, String longName, String agencyId) {
 		super();
 		this.id = id;
 		this.shortName = shortName;
 		this.longName = longName;
+		this.agencyId = agencyId;
 		shapesIDs = new HashSet<String>();
 	}
 
@@ -41,6 +43,10 @@ public class Route {
 
 	public String getLongName() {
 		return longName;
+	}
+	
+	public String getAgencyId() {
+		return agencyId;
 	}
 
 	public Set<String> getShapesIDs() {

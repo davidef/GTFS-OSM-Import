@@ -14,6 +14,7 @@
 **/
 package it.osm.gtfs.plugins;
 
+import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 
 public interface GTFSPlugin {
@@ -26,4 +27,6 @@ public interface GTFSPlugin {
 	 * Allow to exclude some stops from importing
 	 */
 	public Boolean isValidStop(Stop s);
+
+	public boolean isValidRoute(Route route);
 }

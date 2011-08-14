@@ -196,7 +196,7 @@ public class GTFSParser {
 
 		String thisLine;
 		String [] elements;
-		int route_id=-1, route_short_name=-1, route_long_name=-1;
+		int route_id=-1, route_short_name=-1, route_long_name=-1, agency_id = -1;
 
 		BufferedReader br = new BufferedReader(new FileReader(fName));
 		boolean isFirstLine = true;
@@ -209,6 +209,7 @@ public class GTFSParser {
 					if(keys[i].equals("route_id")) route_id = i;
 					else if(keys[i].equals("route_short_name")) route_short_name = i;
 					else if(keys[i].equals("route_long_name")) route_long_name = i;
+					else if(keys[i].equals("agency_id")) agency_id = i;
 				}
 			}
 			else {
@@ -227,7 +228,7 @@ public class GTFSParser {
 				elements = thisLine.split(",");
 
 				if (elements[route_id].length() > 0){
-					result.put(elements[route_id], new Route(elements[route_id],elements[route_short_name],elements[route_long_name]));
+					result.put(elements[route_id], new Route(elements[route_id],elements[route_short_name],elements[route_long_name], elements[agency_id]));
 				}
 			}
 		} 

@@ -14,6 +14,7 @@
 **/
 package it.osm.gtfs.plugins;
 
+import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 
 public class DefaultPlugin implements GTFSPlugin {
@@ -25,6 +26,11 @@ public class DefaultPlugin implements GTFSPlugin {
 
 	@Override
 	public Boolean isValidStop(Stop s) {
+		return true;
+	}
+
+	@Override
+	public boolean isValidRoute(Route route) {
 		return true;
 	}
 

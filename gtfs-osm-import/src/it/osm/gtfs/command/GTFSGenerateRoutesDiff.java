@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.command;
 
 import it.osm.gtfs.input.GTFSParser;
@@ -60,31 +60,34 @@ public class GTFSGenerateRoutesDiff {
 			Set<Trip> uniqueTrips = new HashSet<Trip>(allTrips);
 
 			for (Trip trip:uniqueTrips){
-				StopTimes s = stopTimes.get(trip.getTripID());
-				Relation found = null;
-				for (Relation r: osmRelationNotFoundInGTFS){
-					if (r.equalsStops(s)){
-						found = r;
+				Route route = routes.get(trip.getRouteID());
+				if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
+					StopTimes s = stopTimes.get(trip.getTripID());
+					Relation found = null;
+					for (Relation relation: osmRelationNotFoundInGTFS){
+						if (relation.equalsStops(s)){
+							found = relation;
+						}
+						int affinity = relation.getStopsAffinity(s);
+						Affinity oldAff = affinities.get(relation);
+						if (oldAff == null){
+							oldAff = new Affinity();
+							oldAff.trip = trip;
+							oldAff.affinity = affinity;
+							affinities.put(relation, oldAff);
+						}else if (oldAff.affinity < affinity){
+							oldAff.trip = trip;
+							oldAff.affinity = affinity;
+						}
 					}
-					int affinity = r.getStopsAffinity(s);
-					Affinity oldAff = affinities.get(r);
-					if (oldAff == null){
-						oldAff = new Affinity();
-						oldAff.trip = trip;
-						oldAff.affinity = affinity;
-						affinities.put(r, oldAff);
-					}else if (oldAff.affinity < affinity){
-						oldAff.trip = trip;
-						oldAff.affinity = affinity;
+					if (found != null){
+						osmRelationNotFoundInGTFS.remove(found);
+						osmRelationFoundInGTFS.add(found);
+					}else{
+
+						System.err.println("Warning tripid: " + trip.getTripID() + " (" + trip.getName() + ") not found in OSM, detail below." );
+						System.err.println("Detail: shapeid" + trip.getShapeID() + " shortname: " + route.getShortName() + " longname:" + route.getLongName());
 					}
-				}
-				if (found != null){
-					osmRelationNotFoundInGTFS.remove(found);
-					osmRelationFoundInGTFS.add(found);
-				}else{
-					Route r = routes.get(trip.getRouteID());
-					System.err.println("Warning tripid: " + trip.getTripID() + " (" + trip.getName() + ") not found in OSM, detail below." );
-					System.err.println("Detail: shapeid" + trip.getShapeID() + " shortname: " + r.getShortName() + " longname:" + r.getLongName());
 				}
 			}
 		}

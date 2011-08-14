@@ -14,6 +14,7 @@
 **/
 package it.osm.gtfs.plugins;
 
+import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 
 public class GTTTurinPlugin implements GTFSPlugin {
@@ -44,5 +45,10 @@ public class GTTTurinPlugin implements GTFSPlugin {
 			System.err.println("Warning not numeric ref: " + gs.getCode() + " " + gs.getName() + " " + gs.getGtfsId());
 		}*/
 		return true;
+	}
+
+	@Override
+	public boolean isValidRoute(Route route) {
+		return !"GTT_E".equals(route.getAgencyId());
 	}
 }
