@@ -50,6 +50,7 @@ public class GTFSGenerateRoutesDiff {
 		//looking from mapping gtfs trip into existing osm relations
 		List<Relation> osmRelationNotFoundInGTFS = new LinkedList<StopTimes.Relation>(osmRels);
 		List<Relation> osmRelationFoundInGTFS = new LinkedList<StopTimes.Relation>();
+		List<Trip> tripsNotFoundInOSM = new LinkedList<Trip>();
 
 		Map<String, List<Trip>> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
 		Set<String> keys = new TreeSet<String>(grouppedTrips.keySet());
@@ -84,7 +85,7 @@ public class GTFSGenerateRoutesDiff {
 						osmRelationNotFoundInGTFS.remove(found);
 						osmRelationFoundInGTFS.add(found);
 					}else{
-
+						tripsNotFoundInOSM.add(trip);
 						System.err.println("Warning tripid: " + trip.getTripID() + " (" + trip.getName() + ") not found in OSM, detail below." );
 						System.err.println("Detail: shapeid" + trip.getShapeID() + " shortname: " + route.getShortName() + " longname:" + route.getLongName());
 					}
@@ -112,8 +113,9 @@ public class GTFSGenerateRoutesDiff {
 			}
 		}
 		System.out.println("---");
-		System.out.println("Relation matching in OSM matched in GTFS: " + osmRelationFoundInGTFS.size());
-		System.out.println("Relation matching in OSM not matched in GTFS: " + osmRelationNotFoundInGTFS.size());
+		System.out.println("Relation in OSM matched in GTFS: " + osmRelationFoundInGTFS.size());
+		System.out.println("Relation in OSM not matched in GTFS: " + osmRelationNotFoundInGTFS.size());
+		System.out.println("Trips in GTFS not matched in OSM: " + tripsNotFoundInOSM.size());
 		System.out.println("---");
 	}
 

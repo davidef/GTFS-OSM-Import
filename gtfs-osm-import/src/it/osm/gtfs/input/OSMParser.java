@@ -162,7 +162,7 @@ public class OSMParser {
 			if (!failed)
 				result.add(st);
 			else
-				System.err.println("Warning: failed to parse relation " + st.name);
+				System.err.println("Warning: failed to parse relation " + st.getId() + " " + st.name);
 		}
 
 		return result;
