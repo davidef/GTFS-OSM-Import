@@ -29,18 +29,33 @@ public class OSMXMLUtils {
 		e.setAttribute("v", value);
 		node.appendChild(e);
 	}
+
+	public static void addTagOrReplace(Element node, String key, String value) {
+		Node tag = getTagNode(node, key);
+		if (tag == null){
+			addTag(node, key, value);
+		}else{
+			node.setAttribute("action", "modify");
+			tag.setNodeValue(value);
+		}
+	}
 	
 	public static void addTagIfNotExisting(Element node, String key, String value) {
+		if (getTagNode(node, key) == null)
+			addTag(node, key, value);
+	}
+	
+	private static Node getTagNode(Element node, String key){
 		NodeList childs = node.getChildNodes();
 		for (int t = 0; t < childs.getLength(); t++) {
 			Node attNode = childs.item(t);
 			if (attNode.getAttributes() != null){
 				if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals(key)){
-					return;
+					return attNode;
 				}
 			}
 		}
-		addTag(node, key, value);
+		return null;
 	}
 
 	public static Element createTagElement(IElementCreator document, String key, String value){

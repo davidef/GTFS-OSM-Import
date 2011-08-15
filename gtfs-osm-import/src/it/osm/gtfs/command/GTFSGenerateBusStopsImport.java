@@ -82,7 +82,9 @@ public class GTFSGenerateBusStopsImport {
 			//FIXME: check all tag present
 			int pared_with_gtfs_id = 0;
 			int osm_with_gtfs_id_not_in_gtfs = 0;
-			OSMBusImportGenerator buffer = new OSMBusImportGenerator(bb);
+			int osm_with_different_gtfs_id = 0;
+			OSMBusImportGenerator bufferNotInGTFS = new OSMBusImportGenerator(bb);
+			OSMBusImportGenerator bufferDifferentGTFS = new OSMBusImportGenerator(bb);
 			Map<Double, String> messages = new TreeMap<Double, String>();
 			for (Stop os:osms){
 				if (os.paredWith != null && os.getGtfsId() != null){
@@ -92,19 +94,31 @@ public class GTFSGenerateBusStopsImport {
 						messages.put(dist, "Stop ref " + os.getCode() +
 								" discance GTFS-OSM: " + OSMDistanceUtils.distVincenty(os.getLat(), os.getLon(), os.paredWith.getLat(), os.paredWith.getLon()) + " m");
 					}
+					if (!os.paredWith.getGtfsId().equals(os.getGtfsId())){
+						osm_with_different_gtfs_id++;
+						Element n = (Element) os.originalXMLNode;
+						OSMXMLUtils.addTagOrReplace(n, "gtfs_id", os.paredWith.getGtfsId());
+						bufferDifferentGTFS.appendNode(n);
+						System.out.println("OSM Stop id " + os.getOSMId() +  " had gtfs_id: " + os.getGtfsId() + " but in GTFS has gtfs_id: " + os.paredWith.getGtfsId());	
+					}
 				}else if (os.getGtfsId() != null){
 					osm_with_gtfs_id_not_in_gtfs++;
 					System.out.println("OSM Stop id " + os.getOSMId() +  " had gtfs_id: " + os.getGtfsId() + " but it's no longer in GTFS.");	
 					Element n = (Element) os.originalXMLNode;
-					buffer.appendNode(n);
+					bufferNotInGTFS.appendNode(n);
 				}
 			}
 			for(String msg:messages.values())
 				System.out.println(msg);
-			
+
+			if (osm_with_different_gtfs_id > 0){
+				bufferDifferentGTFS.end();
+				bufferDifferentGTFS.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_PARED_WITH_DIFFERENT_GTFS));
+				System.out.println("OSM stops with different gtfs_id: " + osm_with_different_gtfs_id + " (created josm osm change file to review data: " + GTFSImportSetting.OUTPUT_PARED_WITH_DIFFERENT_GTFS + ")");
+			}
 			if (osm_with_gtfs_id_not_in_gtfs > 0){
-				buffer.end();
-				buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_OSM_WITH_GTFSID_NOT_IN_GTFS));
+				bufferNotInGTFS.end();
+				bufferNotInGTFS.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_OSM_WITH_GTFSID_NOT_IN_GTFS));
 				System.out.println("OSM stops with gtfs_id not found in GTFS: " + osm_with_gtfs_id_not_in_gtfs + " (created josm osm change file to review data: " + GTFSImportSetting.OUTPUT_OSM_WITH_GTFSID_NOT_IN_GTFS + ")");
 			}
 			System.out.println("Pared with gtfs_id: " + pared_with_gtfs_id);	
