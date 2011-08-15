@@ -29,6 +29,7 @@ public class GTFSImportSetting {
 	public static final String OSM_RELATIONS_FILE_NAME = "relations.osm";
 	public static final String OSM_STOP_FILE_NAME = "stops.osm";
 	public static final String OUTPUT_PARED_WITHOUT_GTFS = "gtfs_import_pared_without_gtfsid.osm";
+	public static final String OUTPUT_OSM_WITH_GTFSID_NOT_IN_GTFS = "gtfs_import_osm_with_gtfsid_not_found.osm";
 	public static final String OUTPUT_UNPARED_IN_GTFS = "gtfs_import_unpared_in_gtfs.osm";
 
 	private final Properties properties;
