@@ -31,27 +31,27 @@ public class OSMXMLUtils {
 	}
 
 	public static void addTagOrReplace(Element node, String key, String value) {
-		Node tag = getTagNode(node, key);
+		Element tag = getTagElement(node, key);
 		if (tag == null){
 			addTag(node, key, value);
 		}else{
 			node.setAttribute("action", "modify");
-			tag.setNodeValue(value);
+			tag.setAttribute("v", value);
 		}
 	}
 	
 	public static void addTagIfNotExisting(Element node, String key, String value) {
-		if (getTagNode(node, key) == null)
+		if (getTagElement(node, key) == null)
 			addTag(node, key, value);
 	}
 	
-	private static Node getTagNode(Element node, String key){
+	private static Element getTagElement(Element node, String key){
 		NodeList childs = node.getChildNodes();
 		for (int t = 0; t < childs.getLength(); t++) {
 			Node attNode = childs.item(t);
 			if (attNode.getAttributes() != null){
 				if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals(key)){
-					return attNode;
+					return (Element) attNode;
 				}
 			}
 		}
