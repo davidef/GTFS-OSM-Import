@@ -25,6 +25,11 @@ public class DefaultPlugin implements GTFSPlugin {
 	}
 
 	@Override
+	public String fixTripName(String name) {
+		return name;
+	}
+
+	@Override
 	public Boolean isValidStop(Stop s) {
 		return true;
 	}
@@ -33,5 +38,4 @@ public class DefaultPlugin implements GTFSPlugin {
 	public boolean isValidRoute(Route route) {
 		return true;
 	}
-
 }

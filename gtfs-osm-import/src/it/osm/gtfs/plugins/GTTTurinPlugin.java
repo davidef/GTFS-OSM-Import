@@ -19,17 +19,27 @@ import it.osm.gtfs.model.Stop;
 
 public class GTTTurinPlugin implements GTFSPlugin {
 	public String fixBusStopName(String busStopName){
-		busStopName = busStopName.replace('"', '\'').replaceAll("Fermata [\\d]* - ", "").replaceAll("FERMATA [\\d]* - ", "")
-		.replaceAll("Fermata ST[\\d]* - ", "").replaceAll("Fermata S00[\\d]* - ", "");
+		busStopName = busStopName.replace('"', '\'')
+		    .replaceAll("Fermata [\\d]* - ", "").replaceAll("FERMATA [\\d]* - ", "")
+		    .replaceAll("Fermata ST[\\d]* - ", "").replaceAll("Fermata S00[\\d]* - ", "");
 		if (Character.isUpperCase(busStopName.charAt(1))){
-			String[] words = busStopName.split("\\s");
-			StringBuffer buffer = new StringBuffer();
-			for (String s : words) {
-				buffer.append(capitalize(s) + " ");
-			}
-			return buffer.toString();
+			return camelCase(busStopName).trim();
 		}
 		return busStopName;
+	}
+
+	@Override
+	public String fixTripName(String name) {
+		return camelCase(name).trim();
+	}
+	
+	private static String camelCase(String string) {
+		String[] words = string.split("\\s");
+		StringBuffer buffer = new StringBuffer();
+		for (String s : words) {
+			buffer.append(capitalize(s) + " ");
+		}
+		return buffer.toString();
 	}
 
 	private static String capitalize(String string) {

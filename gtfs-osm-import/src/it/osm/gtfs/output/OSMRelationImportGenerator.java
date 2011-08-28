@@ -32,7 +32,7 @@ public class OSMRelationImportGenerator {
 		for (Stop s:stopTimes.getStops().values()){
 			buffer.append("<member type='node' ref='" + s.originalXMLNode.getAttributes().getNamedItem("id").getNodeValue() + "' role='stop' />\n");
 		}
-		buffer.append("<tag k='direction' v='" + t.getName() + "' />\n");
+		buffer.append("<tag k='direction' v='" + GTFSImportSetting.getInstance().getPlugin().fixTripName(t.getName()) + "' />\n");
 		buffer.append("<tag k='name' v='" + r.getShortName() + ": " + r.getLongName().replaceAll("'", "\'") + "' />\n");
 		buffer.append("<tag k='network' v='" + GTFSImportSetting.getInstance().getNetwork() + "' />\n");
 		buffer.append("<tag k='operator' v='" + GTFSImportSetting.getInstance().getOperator() + "' />\n");

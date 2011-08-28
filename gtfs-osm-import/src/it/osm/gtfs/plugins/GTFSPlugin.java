@@ -22,6 +22,8 @@ public interface GTFSPlugin {
 	 * Apply changes to the bus stop name before generating OSM Import file
 	 */
 	public String fixBusStopName(String stopName);
+
+	public String fixTripName(String name);
 	
 	/**
 	 * Allow to exclude some stops from importing
