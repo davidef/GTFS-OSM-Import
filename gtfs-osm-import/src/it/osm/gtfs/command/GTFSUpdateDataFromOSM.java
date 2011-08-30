@@ -76,17 +76,17 @@ public class GTFSUpdateDataFromOSM {
 	private static void updateFullRels() throws ParserConfigurationException, SAXException, IOException, InterruptedException{
 		List<Stop> osmStops = OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME);
 		Map<String, Stop> osmstopsOsmID = OSMParser.applyOSMIndex(osmStops);
-		List<Relation> osmRels = OSMParser.readOSMRelations(new File(GTFSImportSetting.getInstance().getOSMPath() +  "tmp_rels.osm"), osmstopsOsmID);
+		List<Relation> osmRels = OSMParser.readOSMRelations(new File(GTFSImportSetting.getInstance().getOSMCachePath() +  "tmp_rels.osm"), osmstopsOsmID);
 
 		Process previousTask = null;
 		List<File> sorted = new ArrayList<File>();
 		for (Relation r:osmRels){
 			System.out.println("Processing relation " + r.getId() + " " + r.name);
-			File filesorted = new File(GTFSImportSetting.getInstance().getOSMPath() + "tmp_s" + r.getId() + ".osm");
+			File filesorted = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_s" + r.getId() + ".osm");
 			sorted.add(filesorted);
 			
 			if (!filesorted.exists() || OSMParser.readOSMRelations(filesorted, osmstopsOsmID).get(0).version < r.version){
-				File filerelation = new File(GTFSImportSetting.getInstance().getOSMPath() + "tmp_r" + r.getId() + ".osm");
+				File filerelation = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_r" + r.getId() + ".osm");
 				if (!filerelation.exists() || OSMParser.readOSMRelations(filerelation, osmstopsOsmID).get(0).version < r.version){
 					String url = GTFSImportSetting.OSM_XAPI_SERVER + "relation/" + r.getId() + "/full";
 					DownloadUtils.downlod(url, filerelation);
