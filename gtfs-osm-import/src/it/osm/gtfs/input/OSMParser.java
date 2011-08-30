@@ -11,19 +11,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.input;
 
 import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Stop;
+import it.osm.gtfs.utils.OSMDistanceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,6 +34,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 public class OSMParser {
 
@@ -64,8 +66,8 @@ public class OSMParser {
 
 	public static List<Stop> readOSMStops(String fileName) throws ParserConfigurationException, SAXException, IOException{
 		List<Stop> result = new ArrayList<Stop>();
-		Set<String> refBuses = new HashSet<String>();
-		Set<String> refRails = new HashSet<String>();
+		Multimap<String, Stop> refBuses = HashMultimap.create();
+		Multimap<String, Stop> refRails = HashMultimap.create();
 
 		File file = new File(fileName);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -104,18 +106,27 @@ public class OSMParser {
 			if (st.isRailway() == null)
 				throw new IllegalArgumentException("Unknow node type. We support only highway=bus_stop, railway=tram_stop and railway=station");
 
-			//Check duplicate ref in osm (FIXME:check only within 5 km or so)
+			//Check duplicate ref in osm
 			if (st.getCode() != null)
 				if (st.isRailway()){
-					if (refRails.contains(st.getCode()))
-						System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node this may lead to bad import.");
-					else
-						refRails.add(st.getCode());
+					if (refRails.containsKey(st.getCode())){
+						for (Stop existingStop:refRails.get(st.getCode())){
+							if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
+								System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
+										" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+						}
+					}
+
+					refRails.put(st.getCode(), st);
 				}else{
-					if (refBuses.contains(st.getCode()))
-						System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node this may lead to bad import.");
-					else
-						refBuses.add(st.getCode());
+					if (refBuses.containsKey(st.getCode())){
+						for (Stop existingStop:refBuses.get(st.getCode())){
+							if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
+								System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
+										" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+						}
+					}
+					refBuses.put(st.getCode(), st);
 				}
 
 			result.add(st);
