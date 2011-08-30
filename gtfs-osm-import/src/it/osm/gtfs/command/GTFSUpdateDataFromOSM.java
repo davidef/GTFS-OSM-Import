@@ -88,7 +88,7 @@ public class GTFSUpdateDataFromOSM {
 			if (!filesorted.exists() || OSMParser.readOSMRelations(filesorted, osmstopsOsmID).get(0).version < r.version){
 				File filerelation = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_r" + r.getId() + ".osm");
 				if (!filerelation.exists() || OSMParser.readOSMRelations(filerelation, osmstopsOsmID).get(0).version < r.version){
-					String url = GTFSImportSetting.OSM_XAPI_SERVER + "relation/" + r.getId() + "/full";
+					String url = GTFSImportSetting.OSM_API_SERVER + "relation/" + r.getId() + "/full";
 					DownloadUtils.downlod(url, filerelation);
 				}
 

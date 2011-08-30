@@ -27,6 +27,7 @@ public class GTFSImportSetting {
 	public static final String GTFS_SHAPES_FILE_NAME = "shapes.txt";
 	public static final String GTFS_TRIPS_FILE_NAME = "trips.txt";
 	public static final String OSM_XAPI_SERVER = "http://open.mapquestapi.com/xapi/api/0.6/";
+	public static final String OSM_API_SERVER =  "http://api.openstreetmap.org/api/0.6/";
 	public static final String OSM_RELATIONS_FILE_NAME = "relations.osm";
 	public static final String OSM_STOP_FILE_NAME = "stops.osm";
 	public static final String OUTPUT_PARED_WITHOUT_GTFS = "gtfs_import_pared_without_gtfsid.osm";
