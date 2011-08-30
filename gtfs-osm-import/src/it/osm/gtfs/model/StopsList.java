@@ -18,12 +18,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-public class StopTimes {
+public class StopsList {
 	private String id;
 	private Map<Long, Stop> stops;
 	private Boolean valid = true;
 
-	public StopTimes(String id) {
+	public StopsList(String id) {
 		super();
 		this.id = id;
 		stops = new TreeMap<Long, Stop>();
@@ -60,7 +60,7 @@ public class StopTimes {
 	}
 
 
-	public boolean equalsStops(StopTimes o) {
+	public boolean equalsStops(StopsList o) {
 		if (stops.size() != o.stops.size())
 			return false;
 		for (Long key: o.stops.keySet())
@@ -69,7 +69,7 @@ public class StopTimes {
 		return true;
 	}
 	
-	public int getStopsAffinity(StopTimes o) {
+	public int getStopsAffinity(StopsList o) {
 		int affinity = 0;
 		if (stops.size() == o.stops.size())
 			affinity += stops.size();
@@ -87,13 +87,5 @@ public class StopTimes {
 	         }
 	     }
 	     return null;
-	}
-	
-	public static class Relation extends StopTimes{
-		public String name;
-		
-		public Relation(String id) {
-			super(id);
-		}
 	}
 }

@@ -17,7 +17,7 @@ package it.osm.gtfs.input;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Shape;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes;
+import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
 import it.osm.gtfs.model.Stop.GTFSStop;
 import it.osm.gtfs.utils.GTFSImportSetting;
@@ -96,7 +96,7 @@ public class GTFSParser {
 		return result;
 	}
 
-	public static List<Trip> readTrips(String fName, Map<String, StopTimes> stopTimes) throws IOException{
+	public static List<Trip> readTrips(String fName, Map<String, StopsList> stopTimes) throws IOException{
 		List<Trip> result = new ArrayList<Trip>();
 
 		String thisLine;
@@ -235,8 +235,8 @@ public class GTFSParser {
 		return result;
 	}
 
-	public static Map<String, StopTimes> readStopTimes(String fName, Map<String, Stop> osmstops) throws IOException{
-		Map<String, StopTimes> result = new TreeMap<String, StopTimes>();
+	public static Map<String, StopsList> readStopTimes(String fName, Map<String, Stop> osmstops) throws IOException{
+		Map<String, StopsList> result = new TreeMap<String, StopsList>();
 		Set<String> missingStops = new HashSet<String>();
 		int count = 0;
 
@@ -276,9 +276,9 @@ public class GTFSParser {
 				elements = thisLine.split(",");
 
 				if (elements[trip_id].length() > 0){
-					StopTimes s = result.get(elements[trip_id]);
+					StopsList s = result.get(elements[trip_id]);
 					if (s == null){
-						s = new StopTimes(elements[trip_id]);
+						s = new StopsList(elements[trip_id]);
 						result.put(elements[trip_id], s);
 					}
 					
@@ -300,12 +300,12 @@ public class GTFSParser {
 		return result;
 	}
 	
-	public static Map<String, List<Trip>> groupTrip(List<Trip> trips, Map<String, Route> routes, Map<String, StopTimes> stopTimes){
+	public static Map<String, List<Trip>> groupTrip(List<Trip> trips, Map<String, Route> routes, Map<String, StopsList> stopTimes){
 		Collections.sort(trips);
 		Map<String, List<Trip>> result = new HashMap<String, List<Trip>>();
 		for (Trip t:trips){
 			Route r = routes.get(t.getRouteID());
-			StopTimes s = stopTimes.get(t.getTripID());
+			StopsList s = stopTimes.get(t.getTripID());
 
 			if (s.isValid()){
 				List<Trip> set = result.get(r.getShortName());

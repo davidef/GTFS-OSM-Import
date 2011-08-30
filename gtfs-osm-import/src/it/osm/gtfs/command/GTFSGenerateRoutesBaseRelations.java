@@ -19,7 +19,7 @@ import it.osm.gtfs.input.OSMParser;
 import it.osm.gtfs.model.BoundingBox;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes;
+import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
 import it.osm.gtfs.output.OSMRelationImportGenerator;
 import it.osm.gtfs.utils.GTFSImportSetting;
@@ -42,7 +42,7 @@ public class GTFSGenerateRoutesBaseRelations {
 	public static void run() throws IOException, ParserConfigurationException, SAXException {
 		Map<String, Stop> osmstops = OSMParser.applyGTFSIndex(OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME));
 		Map<String, Route> routes = GTFSParser.readRoutes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_ROUTES_FILE_NAME);
-		Map<String, StopTimes> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstops);
+		Map<String, StopsList> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstops);
 		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_TRIPS_FILE_NAME, stopTimes);
 		BoundingBox bb = new BoundingBox(osmstops.values());
 		
@@ -61,7 +61,7 @@ public class GTFSGenerateRoutesBaseRelations {
 				int count = Collections.frequency(allTrips, trip);
 				
 				Route r = routes.get(trip.getRouteID());
-				StopTimes s = stopTimes.get(trip.getTripID());
+				StopsList s = stopTimes.get(trip.getTripID());
 				
 				FileOutputStream f = new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + "relations/r" + id + " " + r.getShortName().replace("/", "B") + " " + trip.getName().replace("/", "_") + "_" + count + ".osm");
 				f.write(OSMRelationImportGenerator.getRelation(bb, s, trip, r).getBytes());

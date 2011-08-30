@@ -14,8 +14,8 @@
 **/
 package it.osm.gtfs.input;
 
+import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes.Relation;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,10 +124,9 @@ public class OSMParser {
 		return result;
 	}
 
-	public static List<Relation> readOSMRelations(String fileName, Map<String, Stop> stopsWithOSMIndex) throws ParserConfigurationException, SAXException, IOException{
+	public static List<Relation> readOSMRelations(File file, Map<String, Stop> stopsWithOSMIndex) throws ParserConfigurationException, SAXException, IOException{
 		List<Relation> result = new ArrayList<Relation>();
 
-		File file = new File(fileName);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(file);
@@ -138,6 +137,7 @@ public class OSMParser {
 		for (int s = 0; s < relationLst.getLength(); s++) {
 			Node fstNode = relationLst.item(s);
 			Relation st = new Relation(fstNode.getAttributes().getNamedItem("id").getNodeValue());
+			st.version = Integer.parseInt(fstNode.getAttributes().getNamedItem("version").getNodeValue());
 			long seq = 1;
 			boolean failed = false;
 			NodeList att = fstNode.getChildNodes();

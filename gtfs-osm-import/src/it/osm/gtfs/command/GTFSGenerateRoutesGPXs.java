@@ -19,7 +19,7 @@ import it.osm.gtfs.input.OSMParser;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Shape;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes;
+import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
@@ -42,8 +42,8 @@ public class GTFSGenerateRoutesGPXs {
 		Map<String, Stop> osmstops = OSMParser.applyGTFSIndex(OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME));
 		Map<String, Route> routes = GTFSParser.readRoutes(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_ROUTES_FILE_NAME);
 		Map<String, Shape> shapes = GTFSParser.readShapes(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_SHAPES_FILE_NAME);
-		Map<String, StopTimes> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstops);
-		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_TRIPS_FILE_NAME, new HashMap<String, StopTimes>());
+		Map<String, StopsList> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstops);
+		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_TRIPS_FILE_NAME, new HashMap<String, StopsList>());
 		
 		//sorting set
 		Map<String, List<Trip>> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);

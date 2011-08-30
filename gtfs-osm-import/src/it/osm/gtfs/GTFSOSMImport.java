@@ -20,8 +20,7 @@ import it.osm.gtfs.command.GTFSGenerateRoutesBaseRelations;
 import it.osm.gtfs.command.GTFSGenerateRoutesDiff;
 import it.osm.gtfs.command.GTFSGenerateRoutesGPXs;
 import it.osm.gtfs.command.GTFSGetBoundingBox;
-import it.osm.gtfs.command.GTFSGetBusStopFromOSM;
-import it.osm.gtfs.command.GTFSGetRelationsFromOSM;
+import it.osm.gtfs.command.GTFSUpdateDataFromOSM;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
 import java.io.IOException;
@@ -45,13 +44,9 @@ public class GTFSOSMImport {
 		GTFSGetBoundingBox.run();
 	}
 	
-	@Command(description="Generate/update stops.osm file from xapi server")
-	public void osmbus() throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
-		GTFSGetBusStopFromOSM.run();
-	}
-	@Command(description="Generate/update relation.osm file from xapi server")
-	public void osmrels() throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
-		GTFSGetRelationsFromOSM.run();
+	@Command(description="Generate/update osm data from xapi/api server")
+	public void update() throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
+		GTFSUpdateDataFromOSM.run();
 	}
 	
 	@Command(description="Generate files to import bus stops into osm merging with existing stops")

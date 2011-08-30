@@ -16,13 +16,14 @@ package it.osm.gtfs.command;
 
 import it.osm.gtfs.input.GTFSParser;
 import it.osm.gtfs.input.OSMParser;
+import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes;
+import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
-import it.osm.gtfs.model.StopTimes.Relation;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,20 +42,20 @@ public class GTFSGenerateRoutesDiff {
 		List<Stop> osmStops = OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME);
 		Map<String, Stop> osmstopsGTFSId = OSMParser.applyGTFSIndex(osmStops);
 		Map<String, Stop> osmstopsOsmID = OSMParser.applyOSMIndex(osmStops);
-		List<Relation> osmRels = OSMParser.readOSMRelations(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_RELATIONS_FILE_NAME, osmstopsOsmID);
+		List<Relation> osmRels = OSMParser.readOSMRelations(new File(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_RELATIONS_FILE_NAME), osmstopsOsmID);
 
 		Map<String, Route> routes = GTFSParser.readRoutes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_ROUTES_FILE_NAME);
-		Map<String, StopTimes> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstopsGTFSId);
+		Map<String, StopsList> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstopsGTFSId);
 		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_TRIPS_FILE_NAME, stopTimes);
 
 		//looking from mapping gtfs trip into existing osm relations
-		List<Relation> osmRelationNotFoundInGTFS = new LinkedList<StopTimes.Relation>(osmRels);
-		List<Relation> osmRelationFoundInGTFS = new LinkedList<StopTimes.Relation>();
+		List<Relation> osmRelationNotFoundInGTFS = new LinkedList<Relation>(osmRels);
+		List<Relation> osmRelationFoundInGTFS = new LinkedList<Relation>();
 		List<Trip> tripsNotFoundInOSM = new LinkedList<Trip>();
 
 		Map<String, List<Trip>> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
 		Set<String> keys = new TreeSet<String>(grouppedTrips.keySet());
-		Map<Relation, Affinity> affinities = new HashMap<StopTimes.Relation, GTFSGenerateRoutesDiff.Affinity>();
+		Map<Relation, Affinity> affinities = new HashMap<Relation, GTFSGenerateRoutesDiff.Affinity>();
 
 		for (String k:keys){
 			List<Trip> allTrips = grouppedTrips.get(k);
@@ -63,7 +64,7 @@ public class GTFSGenerateRoutesDiff {
 			for (Trip trip:uniqueTrips){
 				Route route = routes.get(trip.getRouteID());
 				if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
-					StopTimes s = stopTimes.get(trip.getTripID());
+					StopsList s = stopTimes.get(trip.getTripID());
 					Relation found = null;
 					for (Relation relation: osmRelationNotFoundInGTFS){
 						if (relation.equalsStops(s)){
@@ -102,8 +103,8 @@ public class GTFSGenerateRoutesDiff {
 			Affinity affinityGTFS = affinities.get(r);
 			System.out.println("Relation " + r.getId() + " (" + r.name + ") NOT matched in GTFS ");
 			System.out.println("Best match (" + affinityGTFS.affinity + "): id: " + affinityGTFS.trip.getTripID() + " " + routes.get(affinityGTFS.trip.getRouteID()).getShortName() + " " + affinityGTFS.trip.getName());
-			StopTimes stopGTFS = stopTimes.get(affinityGTFS.trip.getTripID());
-			StopTimes stopOSM = r;
+			StopsList stopGTFS = stopTimes.get(affinityGTFS.trip.getTripID());
+			StopsList stopOSM = r;
 			long max = Math.max(stopGTFS.getStops().size(), stopOSM.getStops().size());
 			System.out.println("Progressivo \tGTFS\tOSM");
 			for (long f = 1; f <= max ; f++){

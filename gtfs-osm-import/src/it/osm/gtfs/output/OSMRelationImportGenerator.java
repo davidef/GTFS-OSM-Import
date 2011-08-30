@@ -17,14 +17,14 @@ package it.osm.gtfs.output;
 import it.osm.gtfs.model.BoundingBox;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
-import it.osm.gtfs.model.StopTimes;
+import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
 public class OSMRelationImportGenerator {
 
 	//FIXME: refactor
-	public static String getRelation(BoundingBox bb, StopTimes stopTimes, Trip t, Route r){
+	public static String getRelation(BoundingBox bb, StopsList stopTimes, Trip t, Route r){
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<?xml version=\"1.0\"?><osm version='0.5' generator='JOSM'>");
 		buffer.append(bb.getXMLTag());
