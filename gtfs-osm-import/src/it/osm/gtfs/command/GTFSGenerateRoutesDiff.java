@@ -25,6 +25,7 @@ import it.osm.gtfs.utils.GTFSImportSetting;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,6 +37,8 @@ import java.util.TreeSet;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.Multimap;
 
 public class GTFSGenerateRoutesDiff {
 	public static void run() throws ParserConfigurationException, SAXException, IOException{
@@ -53,12 +56,12 @@ public class GTFSGenerateRoutesDiff {
 		List<Relation> osmRelationFoundInGTFS = new LinkedList<Relation>();
 		List<Trip> tripsNotFoundInOSM = new LinkedList<Trip>();
 
-		Map<String, List<Trip>> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
+		Multimap<String, Trip> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
 		Set<String> keys = new TreeSet<String>(grouppedTrips.keySet());
 		Map<Relation, Affinity> affinities = new HashMap<Relation, GTFSGenerateRoutesDiff.Affinity>();
 
 		for (String k:keys){
-			List<Trip> allTrips = grouppedTrips.get(k);
+			Collection<Trip> allTrips = grouppedTrips.get(k);
 			Set<Trip> uniqueTrips = new HashSet<Trip>(allTrips);
 
 			for (Trip trip:uniqueTrips){

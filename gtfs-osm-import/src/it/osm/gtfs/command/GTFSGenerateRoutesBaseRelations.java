@@ -27,6 +27,7 @@ import it.osm.gtfs.utils.GTFSImportSetting;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Multimap;
+
 public class GTFSGenerateRoutesBaseRelations {
 	public static void run() throws IOException, ParserConfigurationException, SAXException {
 		Map<String, Stop> osmstops = OSMParser.applyGTFSIndex(OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME));
@@ -47,14 +50,14 @@ public class GTFSGenerateRoutesBaseRelations {
 		BoundingBox bb = new BoundingBox(osmstops.values());
 		
 		//sorting set
-		Map<String, List<Trip>> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
+		Multimap<String, Trip> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
 		Set<String> keys = new TreeSet<String>(grouppedTrips.keySet());
 
 		new File(GTFSImportSetting.getInstance().getOutputPath() + "relations").mkdirs();
 		
 		int id = 10000;
 		for (String k:keys){
-			List<Trip> allTrips = grouppedTrips.get(k);
+			Collection<Trip> allTrips = grouppedTrips.get(k);
 			Set<Trip> uniqueTrips = new HashSet<Trip>(allTrips);
 			
 			for (Trip trip:uniqueTrips){

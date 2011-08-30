@@ -17,9 +17,9 @@ package it.osm.gtfs.input;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Shape;
 import it.osm.gtfs.model.Stop;
+import it.osm.gtfs.model.Stop.GTFSStop;
 import it.osm.gtfs.model.StopsList;
 import it.osm.gtfs.model.Trip;
-import it.osm.gtfs.model.Stop.GTFSStop;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
 import java.io.BufferedReader;
@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 public class GTFSParser {
 	public static List<GTFSStop> readBusStop(String fName) throws IOException{
@@ -300,20 +303,15 @@ public class GTFSParser {
 		return result;
 	}
 	
-	public static Map<String, List<Trip>> groupTrip(List<Trip> trips, Map<String, Route> routes, Map<String, StopsList> stopTimes){
+	public static Multimap<String, Trip> groupTrip(List<Trip> trips, Map<String, Route> routes, Map<String, StopsList> stopTimes){
 		Collections.sort(trips);
-		Map<String, List<Trip>> result = new HashMap<String, List<Trip>>();
+		Multimap<String, Trip> result = HashMultimap.create();
 		for (Trip t:trips){
 			Route r = routes.get(t.getRouteID());
 			StopsList s = stopTimes.get(t.getTripID());
 
 			if (s.isValid()){
-				List<Trip> set = result.get(r.getShortName());
-				if (set == null){
-					set = new ArrayList<Trip>();
-					result.put(r.getShortName(), set);
-				}
-				set.add(t);
+				result.put(r.getShortName(), t);
 			}
 		}
 		return result;
