@@ -11,29 +11,44 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.utils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class DownloadUtils {
+	private static final int TIMEOUT = 60000;
+
 	public static void downlod(String url, File dest) throws MalformedURLException, IOException{
-		System.out.println("Downloading " + url);
-		BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-		FileOutputStream fos = new FileOutputStream(dest);
-		BufferedOutputStream bout = new BufferedOutputStream(fos,1024);
-		byte[] data = new byte[1024];
-		int x=0;
-		while((x=in.read(data,0,1024))>=0){
-			bout.write(data,0,x);
+		int retry = 0;
+		while (++retry <= 3){
+			System.out.println("Downloading " + url + " Retry count: " + retry);
+			try{
+				URLConnection conn = new URL(url).openConnection();
+				conn.setConnectTimeout(TIMEOUT);
+				conn.setReadTimeout(TIMEOUT);
+				InputStream in = conn.getInputStream();
+				FileOutputStream fos = new FileOutputStream(dest);
+				BufferedOutputStream bout = new BufferedOutputStream(fos,1024);
+				byte[] data = new byte[1024];
+				int x=0;
+				while((x=in.read(data,0,1024))>=0){
+					bout.write(data,0,x);
+				}
+				bout.close();
+				in.close();
+				return;
+			}catch(SocketTimeoutException e){
+			}
 		}
-		bout.close();
-		in.close();
+		throw new SocketTimeoutException();
 	}
 }
