@@ -15,12 +15,16 @@
 package it.osm.gtfs.input;
 
 import it.osm.gtfs.model.Relation;
+import it.osm.gtfs.model.Relation.OSMNode;
+import it.osm.gtfs.model.Relation.OSMRelationWayMember;
+import it.osm.gtfs.model.Relation.OSMWay;
 import it.osm.gtfs.model.Stop;
 import it.osm.gtfs.utils.OSMDistanceUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -136,15 +140,15 @@ public class OSMParser {
 	}
 
 	public static List<Relation> readOSMRelations(File file, Map<String, Stop> stopsWithOSMIndex) throws ParserConfigurationException, SAXException, IOException{
-		List<Relation> result = new ArrayList<Relation>();
-
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(file);
 		doc.getDocumentElement().normalize();
 
-		NodeList relationLst = doc.getElementsByTagName("relation");
+		Map<Long, OSMWay> ways = readWays(doc);
 
+		List<Relation> result = new ArrayList<Relation>();
+		NodeList relationLst = doc.getElementsByTagName("relation");
 		for (int s = 0; s < relationLst.getLength(); s++) {
 			Node fstNode = relationLst.item(s);
 			Relation st = new Relation(fstNode.getAttributes().getNamedItem("id").getNodeValue());
@@ -154,16 +158,35 @@ public class OSMParser {
 			NodeList att = fstNode.getChildNodes();
 			for (int t = 0; t < att.getLength(); t++) {
 				Node attNode = att.item(t);
-				if (attNode.getNodeType() == Element.ELEMENT_NODE &&
-						attNode.getNodeName().equals("member") && 
-						attNode.getAttributes().getNamedItem("type").getNodeValue().equals("node") &&
-						attNode.getAttributes().getNamedItem("role").getNodeValue().equals("stop")){
-					Stop stop = stopsWithOSMIndex.get(attNode.getAttributes().getNamedItem("ref").getNodeValue());
-					if (stop == null){
-						System.err.println("Warning: Node " + attNode.getAttributes().getNamedItem("ref").getNodeValue() + " not found.");
-						failed = true;
+				if (attNode.getNodeType() == Element.ELEMENT_NODE && attNode.getNodeName().equals("member")){
+					if (attNode.getAttributes().getNamedItem("type").getNodeValue().equals("node")){
+						if (attNode.getAttributes().getNamedItem("role").getNodeValue().equals("stop")){
+							Stop stop = stopsWithOSMIndex.get(attNode.getAttributes().getNamedItem("ref").getNodeValue());
+							if (stop == null){
+								System.err.println("Warning: Node " + attNode.getAttributes().getNamedItem("ref").getNodeValue() + " not found.");
+								failed = true;
+							}
+							st.pushPoint(seq++, stop);
+						}else{
+							System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of type node.");
+						}
+					}else if (attNode.getAttributes().getNamedItem("type").getNodeValue().equals("way")){
+						if (attNode.getAttributes().getNamedItem("role").getNodeValue().equals("forward")){
+							OSMRelationWayMember member = new OSMRelationWayMember();
+							member.way = ways.get(Long.parseLong(attNode.getAttributes().getNamedItem("ref").getNodeValue()));
+							member.backward = false;
+							st.wayMembers.add(member);
+						}else if (attNode.getAttributes().getNamedItem("role").getNodeValue().equals("backward")){
+							OSMRelationWayMember member = new OSMRelationWayMember();
+							member.way = ways.get(Long.parseLong(attNode.getAttributes().getNamedItem("ref").getNodeValue()));
+							member.backward = true;
+							st.wayMembers.add(member);
+						}else{
+							System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of type way.");
+						}
+					}else{
+						System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of unknown type .");
 					}
-					st.pushPoint(seq++, stop);
 				}else if (attNode.getNodeType() == Element.ELEMENT_NODE &&
 						attNode.getNodeName().equals("tag") && 
 						attNode.getAttributes().getNamedItem("k").getNodeValue().equals("name")){
@@ -176,6 +199,53 @@ public class OSMParser {
 				System.err.println("Warning: failed to parse relation " + st.getId() + " " + st.name);
 		}
 
+		return result;
+	}
+
+	private static Map<Long, OSMWay> readWays(Document doc){
+		Map<Long, OSMNode> nodes = readNodes(doc);
+		Map<Long, OSMWay> result = new HashMap<Long, Relation.OSMWay>();
+		NodeList relationLst = doc.getElementsByTagName("way");
+		for (int s = 0; s < relationLst.getLength(); s++) {
+			Node fstNode = relationLst.item(s);
+			OSMWay way = new OSMWay(Long.parseLong(fstNode.getAttributes().getNamedItem("id").getNodeValue()));
+			NodeList att = fstNode.getChildNodes();
+			for (int t = 0; t < att.getLength(); t++) {
+				Node attNode = att.item(t);
+				if (attNode.getNodeType() == Element.ELEMENT_NODE && attNode.getNodeName().equals("nd")){
+					way.nodes.add(nodes.get(Long.parseLong(attNode.getAttributes().getNamedItem("ref").getNodeValue())));
+				}else if (attNode.getNodeType() == Element.ELEMENT_NODE &&
+						attNode.getNodeName().equals("tag") && 
+						attNode.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")){
+					if (attNode.getAttributes().getNamedItem("v").getNodeValue().equals("yes") ||
+							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("true")){
+						way.oneway = true;
+					}else if (attNode.getAttributes().getNamedItem("v").getNodeValue().equals("no") ||
+							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("false")){
+						way.oneway = false;
+					}/*else if (attNode.getAttributes().getNamedItem("v").getNodeValue().equals("-1")){ //FIXME: seem not to work
+						Collections.reverse(way.nodes);
+						way.oneway = true;
+					}*/else{
+						System.err.println("Unhandled oneway attribute: " + attNode.getAttributes().getNamedItem("v").getNodeValue());
+					}
+					//FIXME: handle junction roundabout
+				}
+			}
+			result.put(way.getId(), way);
+		}
+		return result;
+	}
+
+	private static Map<Long, OSMNode> readNodes(Document doc){
+		Map<Long, OSMNode> result = new HashMap<Long, OSMNode>();
+		NodeList relationLst = doc.getElementsByTagName("node");
+		for (int s = 0; s < relationLst.getLength(); s++) {
+			Node fstNode = relationLst.item(s);
+			result.put(Long.parseLong(fstNode.getAttributes().getNamedItem("id").getNodeValue()),
+					new OSMNode(Double.parseDouble(fstNode.getAttributes().getNamedItem("lat").getNodeValue()),
+							Double.parseDouble(fstNode.getAttributes().getNamedItem("lon").getNodeValue())));
+		}
 		return result;
 	}
 }

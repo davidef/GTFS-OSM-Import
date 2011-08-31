@@ -15,6 +15,7 @@
 
 package it.osm.gtfs;
 
+import it.osm.gtfs.command.GTFSCheckOsmRoutes;
 import it.osm.gtfs.command.GTFSGenerateBusStopsImport;
 import it.osm.gtfs.command.GTFSGenerateRoutesBaseRelations;
 import it.osm.gtfs.command.GTFSGenerateRoutesDiff;
@@ -42,6 +43,11 @@ public class GTFSOSMImport {
 	@Command(description="Get the Bounding Box of the GTFS File and xapi links")
 	public void bbox() throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		GTFSGetBoundingBox.run();
+	}
+
+	@Command(description="Check and validate OSM relations")
+	public void check() throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
+		GTFSCheckOsmRoutes.run();
 	}
 	
 	@Command(description="Generate/update osm data from xapi/api server")
