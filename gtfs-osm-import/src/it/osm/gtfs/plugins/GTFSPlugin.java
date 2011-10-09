@@ -14,8 +14,10 @@
 **/
 package it.osm.gtfs.plugins;
 
+import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
+import it.osm.gtfs.model.StopsList;
 
 public interface GTFSPlugin {
 	/**
@@ -31,4 +33,9 @@ public interface GTFSPlugin {
 	public Boolean isValidStop(Stop s);
 
 	public boolean isValidRoute(Route route);
+
+	/**
+	 * allow plugins to define custom rules to decide if a route is the same
+	 */
+	public boolean isRelationSameAs(Relation relation, StopsList s);
 }

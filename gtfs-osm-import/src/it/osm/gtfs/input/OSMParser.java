@@ -227,7 +227,7 @@ public class OSMParser {
 						Collections.reverse(way.nodes);
 						way.oneway = true;
 					}*/else{
-						System.err.println("Unhandled oneway attribute: " + attNode.getAttributes().getNamedItem("v").getNodeValue());
+						System.err.println("Unhandled oneway attribute: " + attNode.getAttributes().getNamedItem("v").getNodeValue() + " way id: " + way.getId());
 					}
 					//FIXME: handle junction roundabout
 				}

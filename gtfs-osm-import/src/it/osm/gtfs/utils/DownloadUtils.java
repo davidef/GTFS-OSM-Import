@@ -25,7 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class DownloadUtils {
-	private static final int TIMEOUT = 180000;
+	private static final int TIMEOUT = 30*60000;
 
 	public static void downlod(String url, File dest) throws MalformedURLException, IOException{
 		int retry = 0;

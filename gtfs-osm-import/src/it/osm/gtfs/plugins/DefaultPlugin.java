@@ -14,8 +14,10 @@
 **/
 package it.osm.gtfs.plugins;
 
+import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
+import it.osm.gtfs.model.StopsList;
 
 public class DefaultPlugin implements GTFSPlugin {
 
@@ -37,5 +39,10 @@ public class DefaultPlugin implements GTFSPlugin {
 	@Override
 	public boolean isValidRoute(Route route) {
 		return true;
+	}
+
+	@Override
+	public boolean isRelationSameAs(Relation relation, StopsList s) {
+		return false;
 	}
 }

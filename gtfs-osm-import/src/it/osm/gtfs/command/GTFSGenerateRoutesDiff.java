@@ -70,7 +70,7 @@ public class GTFSGenerateRoutesDiff {
 					StopsList s = stopTimes.get(trip.getTripID());
 					Relation found = null;
 					for (Relation relation: osmRelationNotFoundInGTFS){
-						if (relation.equalsStops(s)){
+						if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
 							found = relation;
 						}
 						int affinity = relation.getStopsAffinity(s);
