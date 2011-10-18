@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 public class GTFSParser {
@@ -305,7 +305,7 @@ public class GTFSParser {
 	
 	public static Multimap<String, Trip> groupTrip(List<Trip> trips, Map<String, Route> routes, Map<String, StopsList> stopTimes){
 		Collections.sort(trips);
-		Multimap<String, Trip> result = HashMultimap.create();
+		Multimap<String, Trip> result = ArrayListMultimap.create();
 		for (Trip t:trips){
 			Route r = routes.get(t.getRouteID());
 			StopsList s = stopTimes.get(t.getTripID());
