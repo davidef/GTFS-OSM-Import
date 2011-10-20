@@ -18,6 +18,11 @@ import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 import it.osm.gtfs.model.StopsList;
+import it.osm.gtfs.model.Trip;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 public class GTTTurinPlugin implements GTFSPlugin {
 	public String fixBusStopName(String busStopName){
@@ -71,10 +76,19 @@ public class GTTTurinPlugin implements GTFSPlugin {
 			for (Long key: s.getStops().keySet())
 				if (!relation.getStops().get(key).equals(s.getStops().get(key)))
 					return false;
-			System.err.println("Matched relation with gtfs bug " + relation.getId() + " " + relation.name);
+			System.err.println("GTTPlugin: Matched relation with gtfs bug " + relation.getId() + " " + relation.name);
 			return true;
 		}else{
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip) {
+		if (Collections.frequency(allTrips, trip) <= 1){
+			System.err.println("GTTPlugin: Ignoring trip " + trip.getTripID() + " found only one, may not be a valid route");
+			return false;
+		}
+		return true;
 	}
 }

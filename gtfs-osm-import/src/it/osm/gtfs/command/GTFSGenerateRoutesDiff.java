@@ -26,6 +26,7 @@ import it.osm.gtfs.utils.GTFSImportSetting;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -66,33 +67,39 @@ public class GTFSGenerateRoutesDiff {
 
 			for (Trip trip:uniqueTrips){
 				Route route = routes.get(trip.getRouteID());
-				if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
-					StopsList s = stopTimes.get(trip.getTripID());
-					Relation found = null;
-					for (Relation relation: osmRelationNotFoundInGTFS){
-						if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
-							found = relation;
+				if (GTFSImportSetting.getInstance().getPlugin().isValidTrip(allTrips, uniqueTrips, trip)){
+					if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
+						StopsList s = stopTimes.get(trip.getTripID());
+						Relation found = null;
+						for (Relation relation: osmRelationNotFoundInGTFS){
+							if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
+								found = relation;
+							}
+							int affinity = relation.getStopsAffinity(s);
+							Affinity oldAff = affinities.get(relation);
+							if (oldAff == null){
+								oldAff = new Affinity();
+								oldAff.trip = trip;
+								oldAff.affinity = affinity;
+								affinities.put(relation, oldAff);
+							}else if (oldAff.affinity < affinity){
+								oldAff.trip = trip;
+								oldAff.affinity = affinity;
+							}
 						}
-						int affinity = relation.getStopsAffinity(s);
-						Affinity oldAff = affinities.get(relation);
-						if (oldAff == null){
-							oldAff = new Affinity();
-							oldAff.trip = trip;
-							oldAff.affinity = affinity;
-							affinities.put(relation, oldAff);
-						}else if (oldAff.affinity < affinity){
-							oldAff.trip = trip;
-							oldAff.affinity = affinity;
+						if (found != null){
+							osmRelationNotFoundInGTFS.remove(found);
+							osmRelationFoundInGTFS.add(found);
+						}else{
+							tripsNotFoundInOSM.add(trip);
+							System.err.println("Warning tripid: " + trip.getTripID() + " (" + trip.getName() + ") not found in OSM, detail below." );
+							System.err.println("Detail: shapeid" + trip.getShapeID() + " shortname: " + route.getShortName() + " longname:" + route.getLongName());
 						}
-					}
-					if (found != null){
-						osmRelationNotFoundInGTFS.remove(found);
-						osmRelationFoundInGTFS.add(found);
 					}else{
-						tripsNotFoundInOSM.add(trip);
-						System.err.println("Warning tripid: " + trip.getTripID() + " (" + trip.getName() + ") not found in OSM, detail below." );
-						System.err.println("Detail: shapeid" + trip.getShapeID() + " shortname: " + route.getShortName() + " longname:" + route.getLongName());
+						System.err.println("Warning tripid: " + trip.getTripID() + " skipped (invalidated route by plugin)." );
 					}
+				}else{
+					System.err.println("Warning tripid: " + trip.getTripID() + " skipped (invalidated trip by plugin)." );
 				}
 			}
 		}
@@ -101,6 +108,11 @@ public class GTFSGenerateRoutesDiff {
 		for (Relation r:osmRelationFoundInGTFS){
 			System.out.println("Relation " + r.getId() + " (" + r.name + ") matched in GTFS ");
 		}
+		System.out.println("---");
+		for (Trip t:tripsNotFoundInOSM){
+			System.out.println("Trip " + t.getTripID() + " (" + t.getName() + ") not found in OSM ");
+		}
+		System.out.println("---");
 		for (Relation r:osmRelationNotFoundInGTFS){
 			System.out.println("---");
 			Affinity affinityGTFS = affinities.get(r);

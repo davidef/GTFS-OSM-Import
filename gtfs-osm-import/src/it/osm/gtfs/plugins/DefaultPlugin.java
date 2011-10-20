@@ -14,10 +14,14 @@
 **/
 package it.osm.gtfs.plugins;
 
+import java.util.Collection;
+import java.util.Set;
+
 import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 import it.osm.gtfs.model.StopsList;
+import it.osm.gtfs.model.Trip;
 
 public class DefaultPlugin implements GTFSPlugin {
 
@@ -44,5 +48,10 @@ public class DefaultPlugin implements GTFSPlugin {
 	@Override
 	public boolean isRelationSameAs(Relation relation, StopsList s) {
 		return false;
+	}
+
+	@Override
+	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip) {
+		return true;
 	}
 }

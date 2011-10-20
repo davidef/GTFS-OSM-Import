@@ -14,10 +14,14 @@
 **/
 package it.osm.gtfs.plugins;
 
+import java.util.Collection;
+import java.util.Set;
+
 import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Route;
 import it.osm.gtfs.model.Stop;
 import it.osm.gtfs.model.StopsList;
+import it.osm.gtfs.model.Trip;
 
 public interface GTFSPlugin {
 	/**
@@ -38,4 +42,6 @@ public interface GTFSPlugin {
 	 * allow plugins to define custom rules to decide if a route is the same
 	 */
 	public boolean isRelationSameAs(Relation relation, StopsList s);
+
+	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip);
 }
