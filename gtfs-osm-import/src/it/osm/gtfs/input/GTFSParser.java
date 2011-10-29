@@ -245,7 +245,7 @@ public class GTFSParser {
 
 		String thisLine;
 		String [] elements;
-		int trip_id=-1, stop_id=-1, stop_sequence=-1;
+		int trip_id=-1, stop_id=-1, stop_sequence=-1, arrival_time = -1;
 
 		BufferedReader br = new BufferedReader(new FileReader(fName));
 		boolean isFirstLine = true;
@@ -260,6 +260,7 @@ public class GTFSParser {
 				String[] keys = thisLine.split(",");
 				for(int i=0; i<keys.length; i++){
 					if(keys[i].equals("trip_id")) trip_id = i;
+					else if(keys[i].equals("arrival_time")) arrival_time = i;
 					else if(keys[i].equals("stop_id")) stop_id = i;
 					else if(keys[i].equals("stop_sequence")) stop_sequence = i;
 				}
@@ -284,10 +285,9 @@ public class GTFSParser {
 						s = new StopsList(elements[trip_id]);
 						result.put(elements[trip_id], s);
 					}
-					
 					String gtfsID = elements[stop_id];
 					if (osmstops.get(gtfsID) != null){
-						s.pushPoint(Long.parseLong(elements[stop_sequence]), osmstops.get(gtfsID));
+						s.pushPoint(Long.parseLong(elements[stop_sequence]), osmstops.get(gtfsID), elements[arrival_time]);
 					}else{
 						s.invalidate();
 						if (!missingStops.contains(gtfsID)){

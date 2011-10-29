@@ -51,7 +51,7 @@ public class DefaultPlugin implements GTFSPlugin {
 	}
 
 	@Override
-	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip) {
+	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip, StopsList stopList) {
 		return true;
 	}
 }

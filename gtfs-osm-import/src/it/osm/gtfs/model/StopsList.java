@@ -21,12 +21,14 @@ import java.util.TreeMap;
 public class StopsList {
 	private String id;
 	private Map<Long, Stop> stops;
+	private Map<Long, String> stopsTime;
 	private Boolean valid = true;
 
 	public StopsList(String id) {
 		super();
 		this.id = id;
 		stops = new TreeMap<Long, Stop>();
+		stopsTime = new TreeMap<Long, String>();
 	}
 
 
@@ -42,8 +44,9 @@ public class StopsList {
 		return id;
 	}
 
-	public void pushPoint(Long seq, Stop stop){
+	public void pushPoint(Long seq, Stop stop, String arrival_time){
 		stops.put(seq, stop);
+		stopsTime.put(seq, arrival_time);
 	}
 
 	public String getRelationAsStopList(Trip t, Route r){
@@ -57,6 +60,10 @@ public class StopsList {
 
 	public Map<Long, Stop> getStops() {
 		return stops;
+	}
+	
+	public Map<Long, String> getStopsTime() {
+		return stopsTime;
 	}
 
 

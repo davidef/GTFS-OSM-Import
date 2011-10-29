@@ -21,15 +21,15 @@ public class Trip implements Comparable<Trip> {
 	private String shapeID;
 	private String tripID;
 	private String name;
-	private StopsList stopTime;
+	private StopsList stopList;
 
-	public Trip(String tripID, String routeID, String shapeID, String name, StopsList stopTime) {
+	public Trip(String tripID, String routeID, String shapeID, String name, StopsList stopList) {
 		super();
 		this.routeID = routeID;
 		this.shapeID = shapeID;
 		this.tripID = tripID;
 		this.name = name;
-		this.stopTime = stopTime;
+		this.stopList = stopList;
 	}
 
 	public String getTripID() {
@@ -53,8 +53,8 @@ public class Trip implements Comparable<Trip> {
 		Trip other = (Trip) obj;
 		return (other.routeID.equals(routeID) && 
 		        other.shapeID.equals(shapeID) && 
-		       ((other.stopTime == null && stopTime == null) || 
-		        (other.stopTime != null && other.stopTime.equalsStops(stopTime))));
+		       ((other.stopList == null && stopList == null) || 
+		        (other.stopList != null && other.stopList.equalsStops(stopList))));
 	}
 	@Override
 	public int hashCode() {
@@ -66,8 +66,8 @@ public class Trip implements Comparable<Trip> {
 		int a = routeID.compareTo(o.routeID);
 		if (a == 0){
 			a = shapeID.compareTo(o.shapeID);
-			if (a == 0 && stopTime != null && o.getStopTime() != null){
-				return stopTime.getId().compareTo(o.getStopTime().getId());
+			if (a == 0 && stopList != null && o.getStopTime() != null){
+				return stopList.getId().compareTo(o.getStopTime().getId());
 			}else{
 				return a;
 			}
@@ -77,6 +77,6 @@ public class Trip implements Comparable<Trip> {
 	}
 
 	private StopsList getStopTime() {
-		return stopTime;
+		return stopList;
 	}
 }

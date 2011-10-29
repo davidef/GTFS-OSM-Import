@@ -166,7 +166,7 @@ public class OSMParser {
 								System.err.println("Warning: Node " + attNode.getAttributes().getNamedItem("ref").getNodeValue() + " not found.");
 								failed = true;
 							}
-							st.pushPoint(seq++, stop);
+							st.pushPoint(seq++, stop, "");
 						}else{
 							System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of type node.");
 						}

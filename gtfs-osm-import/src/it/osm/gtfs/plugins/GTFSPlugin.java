@@ -43,5 +43,5 @@ public interface GTFSPlugin {
 	 */
 	public boolean isRelationSameAs(Relation relation, StopsList s);
 
-	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip);
+	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip, StopsList s);
 }

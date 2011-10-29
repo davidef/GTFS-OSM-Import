@@ -26,7 +26,6 @@ import it.osm.gtfs.utils.GTFSImportSetting;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -67,9 +66,9 @@ public class GTFSGenerateRoutesDiff {
 
 			for (Trip trip:uniqueTrips){
 				Route route = routes.get(trip.getRouteID());
-				if (GTFSImportSetting.getInstance().getPlugin().isValidTrip(allTrips, uniqueTrips, trip)){
+				StopsList s = stopTimes.get(trip.getTripID());
+				if (GTFSImportSetting.getInstance().getPlugin().isValidTrip(allTrips, uniqueTrips, trip, s)){
 					if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
-						StopsList s = stopTimes.get(trip.getTripID());
 						Relation found = null;
 						for (Relation relation: osmRelationNotFoundInGTFS){
 							if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
@@ -110,7 +109,13 @@ public class GTFSGenerateRoutesDiff {
 		}
 		System.out.println("---");
 		for (Trip t:tripsNotFoundInOSM){
-			System.out.println("Trip " + t.getTripID() + " (" + t.getName() + ") not found in OSM ");
+			System.out.println("Trip " + t.getTripID() + " (" + routes.get(t.getRouteID()).getShortName() + " - " + t.getName() + ") not found in OSM ");
+			StopsList stopGTFS = stopTimes.get(t.getTripID());
+			System.out.println("Progressivo \tGTFS\tOSM");
+			for (long f = 1; f <= stopGTFS.getStops().size() ; f++){
+				Stop gtfs= stopGTFS.getStops().get(new Long(f));
+				System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + "-" + "*");
+			}
 		}
 		System.out.println("---");
 		for (Relation r:osmRelationNotFoundInGTFS){
