@@ -20,6 +20,7 @@ import it.osm.gtfs.command.GTFSGenerateBusStopsImport;
 import it.osm.gtfs.command.GTFSGenerateRoutesBaseRelations;
 import it.osm.gtfs.command.GTFSGenerateRoutesDiff;
 import it.osm.gtfs.command.GTFSGenerateRoutesGPXs;
+import it.osm.gtfs.command.GTFSGenerateSQLLiteDB;
 import it.osm.gtfs.command.GTFSGetBoundingBox;
 import it.osm.gtfs.command.GTFSUpdateDataFromOSM;
 import it.osm.gtfs.utils.GTFSImportSetting;
@@ -73,6 +74,12 @@ public class GTFSOSMImport {
 	@Command(description="Analyze the diff between osm relations and gtfs trips")
 	public void reldiff() throws IOException, ParserConfigurationException, SAXException {
 		GTFSGenerateRoutesDiff.run();
+	}
+	
+
+	@Command(description="Generate a sqlite db containg osm relations")
+	public void sqlite() throws ParserConfigurationException, SAXException, IOException{
+		GTFSGenerateSQLLiteDB.run();
 	}
 
 	@Command(description="Display current configuration")

@@ -18,6 +18,7 @@ import it.osm.gtfs.model.Relation;
 import it.osm.gtfs.model.Relation.OSMNode;
 import it.osm.gtfs.model.Relation.OSMRelationWayMember;
 import it.osm.gtfs.model.Relation.OSMWay;
+import it.osm.gtfs.model.Relation.RelationType;
 import it.osm.gtfs.model.Stop;
 import it.osm.gtfs.utils.OSMDistanceUtils;
 
@@ -188,9 +189,18 @@ public class OSMParser {
 						System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of unknown type .");
 					}
 				}else if (attNode.getNodeType() == Element.ELEMENT_NODE &&
-						attNode.getNodeName().equals("tag") && 
-						attNode.getAttributes().getNamedItem("k").getNodeValue().equals("name")){
-					st.name = attNode.getAttributes().getNamedItem("v").getNodeValue();
+						attNode.getNodeName().equals("tag")){
+					String key = attNode.getAttributes().getNamedItem("k").getNodeValue();
+					if (key.equals("name"))
+						st.name = attNode.getAttributes().getNamedItem("v").getNodeValue();
+					else if (key.equals("ref"))
+						st.ref = attNode.getAttributes().getNamedItem("v").getNodeValue();
+					else if (key.equals("from"))
+						st.from = attNode.getAttributes().getNamedItem("v").getNodeValue();
+					else if (key.equals("to"))
+						st.to = attNode.getAttributes().getNamedItem("v").getNodeValue();
+					else if (key.equals("route"))
+						st.type = RelationType.parse(attNode.getAttributes().getNamedItem("v").getNodeValue());
 				}
 			}
 			if (!failed)
