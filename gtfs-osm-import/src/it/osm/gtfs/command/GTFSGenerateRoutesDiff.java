@@ -52,8 +52,8 @@ public class GTFSGenerateRoutesDiff {
 		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_TRIPS_FILE_NAME, stopTimes);
 
 		//looking from mapping gtfs trip into existing osm relations
-		List<Relation> osmRelationNotFoundInGTFS = new LinkedList<Relation>(osmRels);
-		List<Relation> osmRelationFoundInGTFS = new LinkedList<Relation>();
+		Set<Relation> osmRelationNotFoundInGTFS = new HashSet<Relation>(osmRels);
+		Set<Relation> osmRelationFoundInGTFS = new HashSet<Relation>();
 		List<Trip> tripsNotFoundInOSM = new LinkedList<Trip>();
 
 		Multimap<String, Trip> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
@@ -70,7 +70,7 @@ public class GTFSGenerateRoutesDiff {
 				if (GTFSImportSetting.getInstance().getPlugin().isValidTrip(allTrips, uniqueTrips, trip, s)){
 					if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
 						Relation found = null;
-						for (Relation relation: osmRelationNotFoundInGTFS){
+						for (Relation relation: osmRels){
 							if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
 								found = relation;
 							}
