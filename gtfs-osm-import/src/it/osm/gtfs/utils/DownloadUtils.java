@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -47,6 +48,7 @@ public class DownloadUtils {
 				in.close();
 				return;
 			}catch(SocketTimeoutException e){
+			}catch (ConnectException e) {
 			}
 		}
 		throw new SocketTimeoutException();

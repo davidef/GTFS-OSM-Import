@@ -47,8 +47,8 @@ public class GTFSOSMImport {
 	}
 
 	@Command(description="Check and validate OSM relations")
-	public void check() throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
-		GTFSCheckOsmRoutes.run();
+	public void check(String osmId) throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
+		GTFSCheckOsmRoutes.run(osmId);
 	}
 	
 	@Command(description="Generate/update osm data from xapi/api server")
