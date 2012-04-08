@@ -17,6 +17,7 @@ package it.osm.gtfs;
 
 import it.osm.gtfs.command.GTFSCheckOsmRoutes;
 import it.osm.gtfs.command.GTFSGenerateBusStopsImport;
+import it.osm.gtfs.command.GTFSGenerateGeoJSON;
 import it.osm.gtfs.command.GTFSGenerateRoutesBaseRelations;
 import it.osm.gtfs.command.GTFSGenerateRoutesDiff;
 import it.osm.gtfs.command.GTFSGenerateRoutesGPXs;
@@ -32,6 +33,7 @@ import java.lang.reflect.Method;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.json.JSONException;
 import org.xml.sax.SAXException;
 
 import asg.cliche.CLIException;
@@ -80,6 +82,11 @@ public class GTFSOSMImport {
 	@Command(description="Generate a sqlite db containg osm relations")
 	public void sqlite() throws ParserConfigurationException, SAXException, IOException{
 		GTFSGenerateSQLLiteDB.run();
+	}	
+	
+	@Command(description="Generate a geojson file containg osm relations")
+	public void geojson() throws ParserConfigurationException, SAXException, IOException, JSONException{
+		GTFSGenerateGeoJSON.run();
 	}
 
 	@Command(description="Display current configuration")

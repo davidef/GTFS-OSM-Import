@@ -38,5 +38,10 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.mapfish.geo</groupId>
+			<artifactId>mapfish-geo-lib</artifactId>
+			<version>1.2-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
