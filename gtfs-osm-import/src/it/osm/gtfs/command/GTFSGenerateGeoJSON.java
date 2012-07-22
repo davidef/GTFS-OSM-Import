@@ -7,7 +7,6 @@ import it.osm.gtfs.utils.GTFSImportSetting;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -27,7 +26,6 @@ import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class GTFSGenerateGeoJSON {
 

@@ -45,7 +45,6 @@ public class GTFSGenerateBusStopsImport {
 		List<Stop> osms = OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() + GTFSImportSetting.OSM_STOP_FILE_NAME);
 
 		for (GTFSStop gs:gtfs){
-			int count = 0;
 			for (Stop os:osms){
 				if (gs.seams(os)){
 					if (os.isRailway()){
@@ -72,7 +71,6 @@ public class GTFSGenerateBusStopsImport {
 						os.paredWith = gs;
 						
 					}
-					count++;
 				}
 			}
 		}
