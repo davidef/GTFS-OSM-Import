@@ -183,7 +183,10 @@ public class OSMParser {
 							member.backward = true;
 							st.wayMembers.add(member);
 						}else{
-							System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of type way.");
+							OSMRelationWayMember member = new OSMRelationWayMember();
+							member.way = ways.get(Long.parseLong(attNode.getAttributes().getNamedItem("ref").getNodeValue()));
+							member.backward = null;
+							st.wayMembers.add(member);
 						}
 					}else{
 						System.err.println("Warning: Relation " + st.getId() + " has an unsupported member of unknown type .");

@@ -58,6 +58,11 @@ public class GTFSOSMImport {
 		GTFSUpdateDataFromOSM.run();
 	}
 	
+	@Command(description="Generate/update single relation from xapi/api server")
+	public void updates(String relation) throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
+		GTFSUpdateDataFromOSM.run(relation);
+	}
+	
 	@Command(description="Generate files to import bus stops into osm merging with existing stops")
 	public void stops() throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		GTFSGenerateBusStopsImport.run();
