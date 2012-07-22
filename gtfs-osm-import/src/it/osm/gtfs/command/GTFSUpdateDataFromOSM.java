@@ -54,8 +54,6 @@ public class GTFSUpdateDataFromOSM {
 			idWithVersion.put(st.nextToken(), Integer.MAX_VALUE);
 		}
 		
-		System.err.println("FIXME: this delete other relations !!!");
-		
 		updateFullRels(idWithVersion);
 	}
 
