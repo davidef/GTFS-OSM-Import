@@ -4,6 +4,12 @@
 	<groupId>gtfs-osm-import</groupId>
 	<artifactId>gtfs-osm-import</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<repositories>
+	    <repository>
+	        <id>mapfish</id>
+	        <url>http://dev.mapfish.org/maven/repository</url>
+	    </repository>
+	</repositories>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
