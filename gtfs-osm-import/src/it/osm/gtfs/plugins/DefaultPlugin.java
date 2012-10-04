@@ -29,6 +29,11 @@ public class DefaultPlugin implements GTFSPlugin {
 	public String fixBusStopName(String busStopName) {
 		return busStopName;
 	}
+	
+	@Override
+	public String fixBusStopRef(String busStopRef) {
+		return busStopRef;
+	}
 
 	@Override
 	public String fixTripName(String name) {

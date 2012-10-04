@@ -72,7 +72,7 @@ public class Stop {
 	}
 
 	public void setCode(String code) {
-		this.code = code;
+		this.code = GTFSImportSetting.getInstance().getPlugin().fixBusStopRef(code);
 	}
 
 	public void setLat(Double lat) {

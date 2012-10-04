@@ -25,6 +25,13 @@ import java.util.Collections;
 import java.util.Set;
 
 public class GTTTurinPlugin implements GTFSPlugin {
+
+	public String fixBusStopRef(String busStopRef){
+		if (busStopRef.startsWith("0"))
+			return busStopRef.substring(1);
+		return busStopRef;
+	}
+	
 	public String fixBusStopName(String busStopName){
 		busStopName = busStopName.replace('"', '\'')
 		    .replaceAll("Fermata [\\d]* - ", "").replaceAll("FERMATA [\\d]* - ", "")
@@ -76,7 +83,7 @@ public class GTTTurinPlugin implements GTFSPlugin {
 			for (Long key: s.getStops().keySet())
 				if (!relation.getStops().get(key).equals(s.getStops().get(key)))
 					return false;
-			System.err.println("GTTPlugin: Matched relation with gtfs bug " + relation.getId() + " " + relation.name);
+			System.err.println("GTTPlugin: Matched relation with gtfs bug " + relation.getId() + " " + relation.getName());
 			return true;
 		}else{
 			return false;
