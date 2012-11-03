@@ -61,19 +61,19 @@ public class GTFSUpdateDataFromOSM {
 		List<GTFSStop> gtfs = GTFSParser.readBusStop(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_STOP_FILE_NAME);
 		BoundingBox bb = new BoundingBox(gtfs);
 
-		String urlbus = GTFSImportSetting.OSM_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[highway=bus_stop]";
+		String urlbus = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[highway=bus_stop][@meta]";
 		File filebus = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_nbus.osm");
 		DownloadUtils.downlod(urlbus, filebus);
 
 		Thread.sleep(5000L);
 		
-		String urltrm = GTFSImportSetting.OSM_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=tram_stop]";
+		String urltrm = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=tram_stop][@meta]";
 		File filetrm = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_ntram.osm");
 		DownloadUtils.downlod(urltrm, filetrm);
 
 		Thread.sleep(5000L);
 		
-		String urlmtr = GTFSImportSetting.OSM_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=station]";
+		String urlmtr = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=station][@meta]";
 		File filemtr = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_nmetro.osm");
 		DownloadUtils.downlod(urlmtr, filemtr);
 
@@ -87,7 +87,7 @@ public class GTFSUpdateDataFromOSM {
 	}
 
 	private static void updateBaseRels() throws MalformedURLException, IOException{
-		String urlrel = GTFSImportSetting.OSM_XAPI_SERVER + "relation[network=" + GTFSImportSetting.getInstance().getNetwork() +  "]";
+		String urlrel = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "relation[network=" + GTFSImportSetting.getInstance().getNetwork() +  "][@meta]";
 		File filerel = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_rels.osm");
 		DownloadUtils.downlod(urlrel, filerel);
 	}
