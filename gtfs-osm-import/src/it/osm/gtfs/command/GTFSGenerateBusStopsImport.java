@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 
 public class GTFSGenerateBusStopsImport {
-	public static void run() throws IOException, ParserConfigurationException, SAXException, TransformerException {
+	public static void run(boolean smallFileExport) throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		List<GTFSStop> gtfs = GTFSParser.readBusStop(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_STOP_FILE_NAME);
 		BoundingBox bb = new BoundingBox(gtfs);
 
@@ -155,18 +155,24 @@ public class GTFSGenerateBusStopsImport {
 		//new in gtfs
 		{
 			int unpared_in_gtfs = 0;
+			int current_part = 0;
 			OSMBusImportGenerator buffer = new OSMBusImportGenerator(bb);
 
 			for (GTFSStop gs:gtfs){
 				if (gs.paredWith == null && gs.paredWithRailWay == null){
 					unpared_in_gtfs++;
 					buffer.appendNode(gs.getNewXMLNode(buffer));
+					if (smallFileExport && unpared_in_gtfs % 10 == 0){
+						buffer.end();
+						buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS  + "."+ (current_part++) + ".osm"));
+						buffer = new OSMBusImportGenerator(bb);
+					}
 				}
 			}
 			buffer.end();
 			if (unpared_in_gtfs > 0){
-				buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS));
-				System.out.println("Unpared in gtfs: " + unpared_in_gtfs + " (created josm osm change file to import data: " + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS + ")");
+				buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS  + "."+ (current_part++) + ".osm"));
+				System.out.println("Unpared in gtfs: " + unpared_in_gtfs + " (created josm osm change file to import data: " + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS + "[.part].osm)");
 			}else{
 				System.out.println("Unpared in gtfs: " + unpared_in_gtfs);
 			}
