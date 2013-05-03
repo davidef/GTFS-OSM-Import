@@ -63,6 +63,9 @@ public class GTTTurinPlugin implements GTFSPlugin {
 
 	@Override
 	public Boolean isValidStop(Stop gs) {
+		if (gs.getCode().trim().length() == 0){
+			gs.setCode(gs.getGtfsId());
+		}
 		/*try{
 			Integer.parseInt(gs.getCode());
 		}catch(Exception e){
@@ -83,7 +86,7 @@ public class GTTTurinPlugin implements GTFSPlugin {
 			for (Long key: s.getStops().keySet())
 				if (!relation.getStops().get(key).equals(s.getStops().get(key)))
 					return false;
-			System.err.println("GTTPlugin: Matched relation with gtfs bug " + relation.getId() + " " + relation.getName());
+			System.err.println("GTTPlugin: Matched relation with gtfs bug " + relation.getId());
 			return true;
 		}else{
 			return false;
