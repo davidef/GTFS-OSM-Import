@@ -65,6 +65,8 @@ public class GTTTurinPlugin implements GTFSPlugin {
 	public Boolean isValidStop(Stop gs) {
 		if (gs.getCode().trim().length() == 0){
 			gs.setCode(gs.getGtfsId());
+		}else{
+			gs.setCode(fixBusStopRef(gs.getCode()));
 		}
 		/*try{
 			Integer.parseInt(gs.getCode());
