@@ -27,7 +27,8 @@ public class GTFSImportSetting {
 	public static final String GTFS_SHAPES_FILE_NAME = "shapes.txt";
 	public static final String GTFS_TRIPS_FILE_NAME = "trips.txt";
 	public static final String OSM_OVERPASS_XAPI_SERVER = "http://www.overpass-api.de/api/xapi?";
-	//public static final String OSM_XAPI_SERVER = "http://jxapi.osm.rambler.ru/xapi/api/0.6/";
+	//public static final String OSM_OVERPASS_XAPI_SERVER = "http://overpass.osm.rambler.ru/cgi/xapi?";
+	
 	public static final String OSM_API_SERVER =  "http://api.openstreetmap.org/api/0.6/";
 	public static final String OSM_RELATIONS_FILE_NAME = "relations.osm";
 	public static final String OSM_STOP_FILE_NAME = "stops.osm";
