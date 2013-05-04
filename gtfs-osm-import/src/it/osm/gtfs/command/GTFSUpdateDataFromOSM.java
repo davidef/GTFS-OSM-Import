@@ -66,13 +66,19 @@ public class GTFSUpdateDataFromOSM {
 		File filebus = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_nbus.osm");
 		DownloadUtils.downlod(urlbus, filebus);
 
-		Thread.sleep(5000L);
+		Thread.sleep(1000L);
+		
+		String urlstop = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[public_transport=stop_position][@meta]";
+		File filestop = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_nstop.osm");
+		DownloadUtils.downlod(urlstop, filestop);
+
+		Thread.sleep(1000L);
 		
 		String urltrm = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=tram_stop][@meta]";
 		File filetrm = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_ntram.osm");
 		DownloadUtils.downlod(urltrm, filetrm);
 
-		Thread.sleep(5000L);
+		Thread.sleep(1000L);
 		
 		String urlmtr = GTFSImportSetting.OSM_OVERPASS_XAPI_SERVER + "node" + bb.getXAPIQuery() + "[railway=station][@meta]";
 		File filemtr = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_nmetro.osm");
@@ -80,6 +86,7 @@ public class GTFSUpdateDataFromOSM {
 
 		List<File> input = new ArrayList<File>();
 		input.add(filebus);
+		input.add(filestop);
 		input.add(filetrm);
 		input.add(filemtr);
 
