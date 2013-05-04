@@ -106,22 +106,6 @@ public class GTFSImportSetting {
 		}
 		return outputPath;
 	}
-	
-	private String osmosisPath = null;
-	public String getOsmosisPath() {
-		if (osmosisPath == null){
-			synchronized (this) {
-				osmosisPath = properties.getProperty("osmosis-path");
-				if (osmosisPath == null)
-					throw new IllegalArgumentException("Please set a valid osmosis-path.");
-				if (!osmosisPath.endsWith(File.separator))
-					osmosisPath = osmosisPath + File.separator;
-				if (!new File(osmosisPath).isDirectory())
-					throw new IllegalArgumentException("Please set a valid osmosis-path.");
-			}
-		}
-		return osmosisPath;
-	}
 
 	private GTFSPlugin plugin = null;
 	public GTFSPlugin getPlugin(){
