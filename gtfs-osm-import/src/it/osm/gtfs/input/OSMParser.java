@@ -114,40 +114,51 @@ public class OSMParser {
 					if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals("public_transport") &&
 							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("stop_position") &&
 							st.isRailway() == null)
-						st.setIsRailway(false);
-					//FIXME: we should check node has also public_transport => stop_position
+						st.setIsStopPosition(true);
 					if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals("train") &&
 							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("yes"))
 						st.setIsRailway(true);
+					if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals("tram") &&
+							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("yes"))
+						st.setIsRailway(true);
+					if (attNode.getAttributes().getNamedItem("k").getNodeValue().equals("bus") &&
+							attNode.getAttributes().getNamedItem("v").getNodeValue().equals("yes"))
+						st.setIsRailway(false);
 				}
 			}
 
+			
 			if (st.isRailway() == null)
-				throw new IllegalArgumentException("Unknow node type. We support only highway=bus_stop, public_transport=stop_position, railway=tram_stop and railway=station");
+				if (st.isStopPosition())
+					continue; //ignore unsupported stop positions (like ferries)
+				else
+					throw new IllegalArgumentException("Unknow node type for node: " + st.getOSMId() + ". We support only highway=bus_stop, public_transport=stop_position, railway=tram_stop and railway=station");
 
 			//Check duplicate ref in osm
-			if (st.getCode() != null)
-				if (st.isRailway()){
-					if (refRails.containsKey(st.getCode())){
-						for (Stop existingStop:refRails.get(st.getCode())){
-							if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
-								System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
-										" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+			if (st.getCode() != null){
+				if (st.isStopPosition() == null || st.isStopPosition() == false){
+					if (st.isRailway()){
+						if (refRails.containsKey(st.getCode())){
+							for (Stop existingStop:refRails.get(st.getCode())){
+								if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
+									System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
+											" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+							}
 						}
-					}
 
-					refRails.put(st.getCode(), st);
-				}else{
-					if (refBuses.containsKey(st.getCode())){
-						for (Stop existingStop:refBuses.get(st.getCode())){
-							if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
-								System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
-										" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+						refRails.put(st.getCode(), st);
+					}else{
+						if (refBuses.containsKey(st.getCode())){
+							for (Stop existingStop:refBuses.get(st.getCode())){
+								if (OSMDistanceUtils.distVincenty(st.getLat(), st.getLon(), existingStop.getLat(), existingStop.getLon()) < 500)
+									System.err.println("Warning: The ref " + st.getCode() + " is used in more than one node within 500m this may lead to bad import." +
+											" (nodes ids:" + st.getOSMId() + "," + existingStop.getOSMId() + ")");
+							}
 						}
+						refBuses.put(st.getCode(), st);
 					}
-					refBuses.put(st.getCode(), st);
 				}
-
+			}
 			result.add(st);
 		}
 
@@ -163,7 +174,7 @@ public class OSMParser {
 			xr.setErrorHandler(nodeParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		WayParser wayParser;
 		{
 			XMLReader xr = XMLReaderFactory.createXMLReader();
@@ -172,7 +183,7 @@ public class OSMParser {
 			xr.setErrorHandler(wayParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		RelationParser relationParser;
 		{
 			XMLReader xr = XMLReaderFactory.createXMLReader();
@@ -181,17 +192,17 @@ public class OSMParser {
 			xr.setErrorHandler(relationParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		if (relationParser.missingNodes.size() > 0){
 			throw new IllegalArgumentException("Failed to parse some relations. Missing nodes: " + StringUtils.join(relationParser.missingNodes, ", "));
 		}
-		
+
 		return relationParser.result;
 	}
-	
+
 	private static class NodeParser extends DefaultHandler{
 		private Map<Long, OSMNode> result = new HashMap<Long, OSMNode>();
-		
+
 		@Override
 		public void startElement(String uri, String localName, String qName,
 				Attributes attributes) throws SAXException {
@@ -257,7 +268,7 @@ public class OSMParser {
 
 		private List<Relation> result = new ArrayList<Relation>();
 		private List<String> missingNodes = new ArrayList<String>();
-		
+
 		private Relation currentRelation;
 		private long seq = 1;
 		private boolean failed = false;
