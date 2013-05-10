@@ -77,9 +77,12 @@ public class StopsList {
 	public boolean equalsStops(StopsList o) {
 		if (stops.size() != o.stops.size())
 			return false;
-		for (Long key: o.stops.keySet())
-			if (!stops.get(key).equals(o.stops.get(key)))
+		for (Long key: o.stops.keySet()){
+			Stop a = stops.get(key);
+			Stop b = o.stops.get(key);
+			if (a == null || b == null || !a.equals(b))
 				return false;
+		}
 		return true;
 	}
 	

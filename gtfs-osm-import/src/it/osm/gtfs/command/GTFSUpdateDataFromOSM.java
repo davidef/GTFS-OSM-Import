@@ -132,14 +132,20 @@ public class GTFSUpdateDataFromOSM {
 			File filesorted = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_s" + relationId + ".osm");
 			sorted.add(filesorted);
 			
-			if (!filesorted.exists() || OSMParser.readOSMRelations(filesorted, osmstopsOsmID).size() == 0 
-					|| OSMParser.readOSMRelations(filesorted, osmstopsOsmID).get(0).getVersion() < idWithVersion.get(relationId)){
-				File filerelation = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_r" + relationId + ".osm");
-				if (!filerelation.exists() || OSMParser.readOSMRelations(filerelation, osmstopsOsmID).size() == 0
-						|| OSMParser.readOSMRelations(filerelation, osmstopsOsmID).get(0).getVersion() < idWithVersion.get(relationId)){
-					String url = GTFSImportSetting.OSM_API_SERVER + "relation/" + relationId + "/full";
-					DownloadUtils.downlod(url, filerelation);
+			boolean uptodate = false;
+			try{
+				if (filesorted.exists()){
+					List<Relation> relationInFile = OSMParser.readOSMRelations(filesorted, osmstopsOsmID);
+					if (relationInFile.size() > 0 && relationInFile.get(0).getVersion() == idWithVersion.get(relationId))
+						uptodate = true;
 				}
+			}catch (Exception e) {
+			}
+			
+			if (!uptodate){
+				File filerelation = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_r" + relationId + ".osm");
+				String url = GTFSImportSetting.OSM_API_SERVER + "relation/" + relationId + "/full";
+				DownloadUtils.downlod(url, filerelation);
 				
 				Pipeline current = OsmosisUtils.runOsmosisSort(filerelation, filesorted);
 				OsmosisUtils.checkProcessOutput(previousTask);
