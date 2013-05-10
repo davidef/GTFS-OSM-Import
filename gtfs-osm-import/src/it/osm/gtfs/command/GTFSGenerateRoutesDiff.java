@@ -73,6 +73,10 @@ public class GTFSGenerateRoutesDiff {
 						Relation found = null;
 						for (Relation relation: osmRels){
 							if (relation.equalsStops(s) || GTFSImportSetting.getInstance().getPlugin().isRelationSameAs(relation, s)){
+								if (found != null){
+									osmRelationNotFoundInGTFS.remove(found);
+									osmRelationFoundInGTFS.add(found);
+								}
 								found = relation;
 							}
 							int affinity = relation.getStopsAffinity(s);
@@ -131,7 +135,11 @@ public class GTFSGenerateRoutesDiff {
 			for (long f = 1; f <= max ; f++){
 				Stop gtfs= stopGTFS.getStops().get(new Long(f));
 				Stop osm = stopOSM.getStops().get(new Long(f));
-				System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + ((osm != null) ? osm.getCode() : "-") + ((gtfs != null) && (osm != null) &&  gtfs.getCode().equals(osm.getCode()) ? "" : "*") + "\t" + ((osm != null) ? osm.getName() : "-"));
+				try{
+					System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + ((osm != null) ? osm.getCode() : "-") + ((gtfs != null) && (osm != null) &&  gtfs.getCode().equals(osm.getCode()) ? "" : "*") + "\t" + ((osm != null) ? osm.getName() : "-"));
+				}catch (Exception e) {
+					System.out.println("Stop # " + f + "\t-\r-");
+				}
 			}
 		}
 		System.out.println("---");

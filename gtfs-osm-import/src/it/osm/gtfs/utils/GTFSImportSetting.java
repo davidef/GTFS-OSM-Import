@@ -27,14 +27,15 @@ public class GTFSImportSetting {
 	public static final String GTFS_SHAPES_FILE_NAME = "shapes.txt";
 	public static final String GTFS_TRIPS_FILE_NAME = "trips.txt";
 	public static final String OSM_OVERPASS_XAPI_SERVER = "http://www.overpass-api.de/api/xapi?";
-	//public static final String OSM_XAPI_SERVER = "http://jxapi.osm.rambler.ru/xapi/api/0.6/";
+	//public static final String OSM_OVERPASS_XAPI_SERVER = "http://overpass.osm.rambler.ru/cgi/xapi?";
+	
 	public static final String OSM_API_SERVER =  "http://api.openstreetmap.org/api/0.6/";
 	public static final String OSM_RELATIONS_FILE_NAME = "relations.osm";
 	public static final String OSM_STOP_FILE_NAME = "stops.osm";
 	public static final String OUTPUT_PARED_WITHOUT_GTFS = "gtfs_import_pared_without_gtfsid.osm";
 	public static final String OUTPUT_PARED_WITH_DIFFERENT_GTFS = "gtfs_import_pared_with_different_gtfsid.osm";
 	public static final String OUTPUT_OSM_WITH_GTFSID_NOT_IN_GTFS = "gtfs_import_osm_with_gtfsid_not_found.osm";
-	public static final String OUTPUT_UNPARED_IN_GTFS = "gtfs_import_unpared_in_gtfs.osm";
+	public static final String OUTPUT_UNPARED_IN_GTFS = "gtfs_import_unpared_in_gtfs";
 
 	private final Properties properties;
 
@@ -105,22 +106,6 @@ public class GTFSImportSetting {
 			}
 		}
 		return outputPath;
-	}
-	
-	private String osmosisPath = null;
-	public String getOsmosisPath() {
-		if (osmosisPath == null){
-			synchronized (this) {
-				osmosisPath = properties.getProperty("osmosis-path");
-				if (osmosisPath == null)
-					throw new IllegalArgumentException("Please set a valid osmosis-path.");
-				if (!osmosisPath.endsWith(File.separator))
-					osmosisPath = osmosisPath + File.separator;
-				if (!new File(osmosisPath).isDirectory())
-					throw new IllegalArgumentException("Please set a valid osmosis-path.");
-			}
-		}
-		return osmosisPath;
 	}
 
 	private GTFSPlugin plugin = null;

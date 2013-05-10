@@ -14,13 +14,16 @@
 **/
 package it.osm.gtfs.model;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import it.osm.gtfs.output.IElementCreator;
 import it.osm.gtfs.utils.GTFSImportSetting;
 import it.osm.gtfs.utils.OSMDistanceUtils;
 import it.osm.gtfs.utils.OSMXMLUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class Stop {
 	private String gtfsId;
@@ -29,6 +32,7 @@ public class Stop {
 	private Double lon;
 	private String name;
 	private Boolean isRailway;
+	private Boolean isStopPosition = false;
 	public Stop paredWith;
 	public Node originalXMLNode;
 	
@@ -59,6 +63,9 @@ public class Stop {
 	public Boolean isRailway(){
 		return isRailway;
 	}
+	public Boolean isStopPosition(){
+		return isStopPosition;
+	}
 	public String getOSMId(){
 		return (originalXMLNode == null) ? null : originalXMLNode.getAttributes().getNamedItem("id").getNodeValue();
 	}
@@ -66,6 +73,9 @@ public class Stop {
 
 	public void setIsRailway(Boolean isRailway){
 		this.isRailway = isRailway;
+	}
+	public void setIsStopPosition(Boolean isStopPosition){
+		this.isStopPosition = isStopPosition;
 	}
 	public void setGtfsId(String gtfsId) {
 		this.gtfsId = gtfsId;
@@ -144,7 +154,7 @@ public class Stop {
 		}catch(Exception e){
 			id = (long) Math.abs(getGtfsId().hashCode());
 		}
-		
+
 		node.setAttribute("id", "-" + id);
 		node.setAttribute("visible", "true");
 		node.setAttribute("lat", getLat().toString());
@@ -164,6 +174,7 @@ public class Stop {
 	
 	public static class GTFSStop extends Stop{
 		public Stop paredWithRailWay;
+		public List<Stop> paredWithStopPositions = new ArrayList<Stop>();
 		
 		public GTFSStop(String gtfsId, String code, Double lat, Double lon, String name) {
 			super(gtfsId, code, lat, lon, name);

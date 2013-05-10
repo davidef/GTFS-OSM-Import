@@ -39,6 +39,11 @@ public class BoundingBox {
 			maxLat = Math.max(maxLat, s.getLat()); 
 			maxLon = Math.max(maxLon, s.getLon());
 		}
+		//expand the bbox to fit point near the border
+		minLat -= 0.01;
+		minLon -= 0.01;
+		maxLat += 0.01;
+		maxLon += 0.01;
 	}
 
 	@Override

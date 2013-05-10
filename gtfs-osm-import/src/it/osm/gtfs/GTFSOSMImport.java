@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 
 package it.osm.gtfs;
 
@@ -68,7 +68,12 @@ public class GTFSOSMImport {
 	
 	@Command(description="Generate files to import bus stops into osm merging with existing stops")
 	public void stops() throws IOException, ParserConfigurationException, SAXException, TransformerException {
-		GTFSGenerateBusStopsImport.run();
+		GTFSGenerateBusStopsImport.run(false);
+	}
+	
+	@Command(description="Generate files to import bus stops into osm merging with existing stops (export to small file)")
+	public void stops(Boolean smallFile) throws IOException, ParserConfigurationException, SAXException, TransformerException, InterruptedException {
+		GTFSGenerateBusStopsImport.run(smallFile);
 	}
 
 	@Command(description="Generate .gpx file for all GTFS Trips")
@@ -162,6 +167,8 @@ public class GTFSOSMImport {
 		shell.processLine("conf");
 		shell.processLine("help");
 		shell.commandLoop();
+		// ensure we close app at this point even with awt resourced leaked
+		System.exit(0);
 	}
 	
 	private static void initChecks(){

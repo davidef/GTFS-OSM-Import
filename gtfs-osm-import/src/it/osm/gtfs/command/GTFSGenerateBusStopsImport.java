@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.command;
 
 import it.osm.gtfs.input.GTFSParser;
@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
 
 
 public class GTFSGenerateBusStopsImport {
-	public static void run() throws IOException, ParserConfigurationException, SAXException, TransformerException {
+	public static void run(boolean smallFileExport) throws IOException, ParserConfigurationException, SAXException, TransformerException {
 		List<GTFSStop> gtfs = GTFSParser.readBusStop(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_STOP_FILE_NAME);
 		BoundingBox bb = new BoundingBox(gtfs);
 
@@ -47,7 +47,18 @@ public class GTFSGenerateBusStopsImport {
 		for (GTFSStop gs:gtfs){
 			for (Stop os:osms){
 				if (gs.seams(os)){
-					if (os.isRailway()){
+					if (os.isStopPosition()){
+						if (os.paredWith != null){
+							System.err.println("Mupliple paring found.");
+							System.err.println(" OSM: " + os);
+							System.err.println("GTFS: " + gs);
+							System.err.println(" OSM: " + gs.paredWithRailWay);
+							System.err.println("GTFS: " + os.paredWith);
+							throw new IllegalArgumentException("Multiple paring found, this is currently unsupported.");
+						}
+						gs.paredWithStopPositions.add(os);
+						os.paredWith = gs;
+					}else if (os.isRailway()){
 						if (gs.paredWithRailWay != null || os.paredWith != null){
 							System.err.println("Mupliple paring found.");
 							System.err.println(" OSM: " + os);
@@ -69,7 +80,7 @@ public class GTFSGenerateBusStopsImport {
 						}
 						gs.paredWith = os;
 						os.paredWith = gs;
-						
+
 					}
 				}
 			}
@@ -137,7 +148,7 @@ public class GTFSGenerateBusStopsImport {
 					OSMXMLUtils.addTagIfNotExisting(n, "bench", "unknown");
 					OSMXMLUtils.addTagIfNotExisting(n, "tactile_paving", "unknown");
 					OSMXMLUtils.addTagIfNotExisting(n, "name", GTFSImportSetting.getInstance().getPlugin().fixBusStopName(os.paredWith.getName()));
-					
+
 					buffer.appendNode(n);
 
 					pared_without_gtfs_id++;
@@ -155,18 +166,24 @@ public class GTFSGenerateBusStopsImport {
 		//new in gtfs
 		{
 			int unpared_in_gtfs = 0;
+			int current_part = 0;
 			OSMBusImportGenerator buffer = new OSMBusImportGenerator(bb);
 
 			for (GTFSStop gs:gtfs){
-				if (gs.paredWith == null && gs.paredWithRailWay == null){
+				if (gs.paredWith == null && gs.paredWithRailWay == null && gs.paredWithStopPositions.size() == 0){
 					unpared_in_gtfs++;
 					buffer.appendNode(gs.getNewXMLNode(buffer));
+					if (smallFileExport && unpared_in_gtfs % 10 == 0){
+						buffer.end();
+						buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS  + "."+ (current_part++) + ".osm"));
+						buffer = new OSMBusImportGenerator(bb);
+					}
 				}
 			}
 			buffer.end();
 			if (unpared_in_gtfs > 0){
-				buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS));
-				System.out.println("Unpared in gtfs: " + unpared_in_gtfs + " (created josm osm change file to import data: " + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS + ")");
+				buffer.saveTo(new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS  + "."+ (current_part++) + ".osm"));
+				System.out.println("Unpared in gtfs: " + unpared_in_gtfs + " (created josm osm change file to import data: " + GTFSImportSetting.OUTPUT_UNPARED_IN_GTFS + "[.part].osm)");
 			}else{
 				System.out.println("Unpared in gtfs: " + unpared_in_gtfs);
 			}
