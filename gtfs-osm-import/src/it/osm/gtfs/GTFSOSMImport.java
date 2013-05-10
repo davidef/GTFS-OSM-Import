@@ -24,8 +24,11 @@ import it.osm.gtfs.command.GTFSGenerateRoutesGPXs;
 import it.osm.gtfs.command.GTFSGenerateSQLLiteDB;
 import it.osm.gtfs.command.GTFSGetBoundingBox;
 import it.osm.gtfs.command.GTFSUpdateDataFromOSM;
+import it.osm.gtfs.command.gui.GTFSRouteDiffGui;
 import it.osm.gtfs.utils.GTFSImportSetting;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -77,12 +80,41 @@ public class GTFSOSMImport {
 	public void rels() throws IOException, ParserConfigurationException, SAXException {
 		GTFSGenerateRoutesBaseRelations.run();
 	}
-	
+
 	@Command(description="Analyze the diff between osm relations and gtfs trips")
 	public void reldiff() throws IOException, ParserConfigurationException, SAXException {
 		GTFSGenerateRoutesDiff.run();
 	}
 	
+	@Command(description="Analyze the diff between osm relations and gtfs trips")
+	public void reldiffx() throws IOException, ParserConfigurationException, SAXException {
+		final Object lock = new Object();
+		final GTFSRouteDiffGui app = new GTFSRouteDiffGui();
+		
+		app.setVisible(true); 
+	    app.addWindowListener(new WindowAdapter() {
+
+	        @Override
+	        public void windowClosing(WindowEvent arg0) {
+	            synchronized (lock) {
+	                app.setVisible(false);
+	                lock.notify();
+	            }
+	        }
+
+	    });
+	    
+	    synchronized(lock) {
+            while (app.isVisible())
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        }
+	    app.dispose();
+        System.out.println("Done");
+	}
 
 	@Command(description="Generate a sqlite db containg osm relations")
 	public void sqlite() throws ParserConfigurationException, SAXException, IOException{

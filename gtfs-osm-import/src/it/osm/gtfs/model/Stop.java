@@ -138,7 +138,14 @@ public class Stop {
 	
 	public Element getNewXMLNode(IElementCreator document){
 		Element node = document.createElement("node");
-		node.setAttribute("id", "-" + getGtfsId());
+		Long id;
+		try{
+			id = Long.valueOf(getGtfsId());
+		}catch(Exception e){
+			id = (long) Math.abs(getGtfsId().hashCode());
+		}
+		
+		node.setAttribute("id", "-" + id);
 		node.setAttribute("visible", "true");
 		node.setAttribute("lat", getLat().toString());
 		node.setAttribute("lon", getLon().toString());

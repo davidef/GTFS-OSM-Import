@@ -108,11 +108,11 @@ public class GTFSGenerateSQLLiteDB {
 		PreparedStatement stm = connection.prepareStatement("insert into relation values(?, ?, ?, ?, ?, ?)");
 		for (Relation r : rels) {
 			stm.setLong(1, Long.valueOf(r.getId()));
-			stm.setString(2, r.ref);
-			stm.setString(3, r.name);
-			stm.setString(4, r.from);
-			stm.setString(5, r.to);
-			stm.setInt(6, r.type.dbId());
+			stm.setString(2, r.getRef());
+			stm.setString(3, r.getName());
+			stm.setString(4, r.getFrom());
+			stm.setString(5, r.getTo());
+			stm.setInt(6, r.getType().dbId());
 			stm.executeUpdate();
 		}
 		stm = connection.prepareStatement("insert into relation_stops values(?, ?, ?)");

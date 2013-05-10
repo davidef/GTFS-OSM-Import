@@ -46,7 +46,8 @@ public class GTFSGenerateRoutesGPXs {
 		Map<String, Route> routes = GTFSParser.readRoutes(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_ROUTES_FILE_NAME);
 		Map<String, Shape> shapes = GTFSParser.readShapes(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_SHAPES_FILE_NAME);
 		Map<String, StopsList> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstops);
-		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_TRIPS_FILE_NAME, new HashMap<String, StopsList>());
+		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() + GTFSImportSetting.GTFS_TRIPS_FILE_NAME,
+				routes, new HashMap<String, StopsList>());
 		
 		//sorting set
 		Multimap<String, Trip> grouppedTrips = GTFSParser.groupTrip(trips, routes, stopTimes);
@@ -60,7 +61,7 @@ public class GTFSGenerateRoutesGPXs {
 			Set<Trip> uniqueTrips = new HashSet<Trip>(allTrips);
 
 			for (Trip trip:uniqueTrips){
-				Route r = routes.get(trip.getRouteID());
+				Route r = routes.get(trip.getRoute().getId());
 				Shape s = shapes.get(trip.getShapeID());
 
 				FileOutputStream f = new FileOutputStream(GTFSImportSetting.getInstance().getOutputPath() + "/gpx/r" + id++ + " " + r.getShortName().replace("/", "B") + " " + trip.getName().replace("/", "_") + ".gpx");

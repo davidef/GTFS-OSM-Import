@@ -154,7 +154,7 @@ public class OSMParser {
 			xr.setErrorHandler(nodeParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		WayParser wayParser;
 		{
 			XMLReader xr = XMLReaderFactory.createXMLReader();
@@ -163,7 +163,7 @@ public class OSMParser {
 			xr.setErrorHandler(wayParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		RelationParser relationParser;
 		{
 			XMLReader xr = XMLReaderFactory.createXMLReader();
@@ -172,13 +172,13 @@ public class OSMParser {
 			xr.setErrorHandler(relationParser);
 			xr.parse(new InputSource(new FileReader(file)));
 		}
-		
+
 		return relationParser.result;
 	}
-	
+
 	private static class NodeParser extends DefaultHandler{
 		private Map<Long, OSMNode> result = new HashMap<Long, OSMNode>();
-		
+
 		@Override
 		public void startElement(String uri, String localName, String qName,
 				Attributes attributes) throws SAXException {
@@ -217,13 +217,13 @@ public class OSMParser {
 					}else if (attributes.getValue("v").equals("no") ||
 							attributes.getValue("v").equals("false")){
 						currentWay.oneway = false;
-					}/*else if (attNode.getAttributes().getNamedItem("v").getNodeValue().equals("-1")){ //FIXME: seem not to work
-							Collections.reverse(way.nodes);
-							way.oneway = true;
-						}*/else{
-							System.err.println("Unhandled oneway attribute: " + attributes.getValue("v") + " way id: " + currentWay.getId());
-						}
-					//FIXME: handle junction roundabout
+					}else{
+						System.err.println("Unhandled oneway attribute: " + attributes.getValue("v") + " way id: " + currentWay.getId());
+					}
+				}else if (attributes.getValue("k").equals("junction")){
+					if (attributes.getValue("v").equals("roundabout")){
+						currentWay.oneway = true;
+					}
 				}
 			}
 		}
@@ -260,7 +260,7 @@ public class OSMParser {
 
 			if (localName.equals("relation")){
 				currentRelation = new Relation(attributes.getValue("id"));
-				currentRelation.version = Integer.parseInt(attributes.getValue("version"));
+				currentRelation.setVersion(Integer.parseInt(attributes.getValue("version")));
 				seq = 1;
 				failed = false;
 			}else if(currentRelation != null && localName.equals("member")){
@@ -283,17 +283,17 @@ public class OSMParser {
 						OSMRelationWayMember member = new OSMRelationWayMember();
 						member.way = ways.get(Long.parseLong(attributes.getValue("ref")));
 						member.backward = false;
-						currentRelation.wayMembers.add(member);
+						currentRelation.getWayMembers().add(member);
 					}else if (role.equals("backward")){
 						OSMRelationWayMember member = new OSMRelationWayMember();
 						member.way = ways.get(Long.parseLong(attributes.getValue("ref")));
 						member.backward = true;
-						currentRelation.wayMembers.add(member);
+						currentRelation.getWayMembers().add(member);
 					}else{
 						OSMRelationWayMember member = new OSMRelationWayMember();
 						member.way = ways.get(Long.parseLong(attributes.getValue("ref")));
 						member.backward = null;
-						currentRelation.wayMembers.add(member);
+						currentRelation.getWayMembers().add(member);
 					}
 				}else{
 					System.err.println("Warning: Relation " + currentRelation.getId() + " has an unsupported member of unknown type .");
@@ -301,15 +301,15 @@ public class OSMParser {
 			}else if (currentRelation != null && localName.equals("tag")){
 				String key = attributes.getValue("k");
 				if (key.equals("name"))
-					currentRelation.name = attributes.getValue("v");
+					currentRelation.setName(attributes.getValue("v"));
 				else if (key.equals("ref"))
-					currentRelation.ref = attributes.getValue("v");
+					currentRelation.setRef(attributes.getValue("v"));
 				else if (key.equals("from"))
-					currentRelation.from = attributes.getValue("v");
+					currentRelation.setFrom(attributes.getValue("v"));
 				else if (key.equals("to"))
-					currentRelation.to = attributes.getValue("v");
+					currentRelation.setTo(attributes.getValue("v"));
 				else if (key.equals("route"))
-					currentRelation.type = RelationType.parse(attributes.getValue("v"));
+					currentRelation.setType(RelationType.parse(attributes.getValue("v")));
 			}
 		}
 
@@ -320,7 +320,7 @@ public class OSMParser {
 				if (!failed){
 					result.add(currentRelation);
 				}else{
-					System.err.println("Warning: failed to parse relation " + currentRelation.getId() + " " + currentRelation.name);
+					System.err.println("Warning: failed to parse relation " + currentRelation.getId() + " " + currentRelation.getName());
 				}
 				currentRelation = null;
 			}

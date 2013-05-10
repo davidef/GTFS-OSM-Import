@@ -17,15 +17,15 @@ package it.osm.gtfs.model;
 
 
 public class Trip implements Comparable<Trip> {
-	private String routeID;
+	private Route route;
 	private String shapeID;
 	private String tripID;
 	private String name;
 	private StopsList stopList;
 
-	public Trip(String tripID, String routeID, String shapeID, String name, StopsList stopList) {
+	public Trip(String tripID, Route route, String shapeID, String name, StopsList stopList) {
 		super();
-		this.routeID = routeID;
+		this.route = route;
 		this.shapeID = shapeID;
 		this.tripID = tripID;
 		this.name = name;
@@ -36,8 +36,13 @@ public class Trip implements Comparable<Trip> {
 		return tripID;
 	}
 
+	@Deprecated
 	public String getRouteID() {
-		return routeID;
+		return route.getId();
+	}
+	
+	public Route getRoute() {
+		return route;
 	}
 
 	public String getShapeID() {
@@ -51,23 +56,27 @@ public class Trip implements Comparable<Trip> {
 	@Override
 	public boolean equals(Object obj) {
 		Trip other = (Trip) obj;
-		return (other.routeID.equals(routeID) && 
+		return (other.route.equals(route) && 
 		        other.shapeID.equals(shapeID) && 
 		       ((other.stopList == null && stopList == null) || 
 		        (other.stopList != null && other.stopList.equalsStops(stopList))));
 	}
 	@Override
 	public int hashCode() {
-		return routeID.hashCode() + shapeID.hashCode();
+		return route.getId().hashCode() + shapeID.hashCode();
 	}
 
 	@Override
 	public int compareTo(Trip o) {
-		int a = routeID.compareTo(o.routeID);
+		int a = route.compareTo(o.route);
 		if (a == 0){
 			a = shapeID.compareTo(o.shapeID);
 			if (a == 0 && stopList != null && o.getStopTime() != null){
-				return stopList.getId().compareTo(o.getStopTime().getId());
+				if ((o.stopList != null && o.stopList.equalsStops(stopList))){
+					return 0;
+				}else{
+					return stopList.getId().compareTo(o.getStopTime().getId());
+				}
 			}else{
 				return a;
 			}
@@ -76,7 +85,7 @@ public class Trip implements Comparable<Trip> {
 		}
 	}
 
-	private StopsList getStopTime() {
+	public StopsList getStopTime() {
 		return stopList;
 	}
 }

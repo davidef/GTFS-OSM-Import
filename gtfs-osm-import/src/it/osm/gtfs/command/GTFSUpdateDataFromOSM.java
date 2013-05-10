@@ -29,10 +29,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -100,7 +98,7 @@ public class GTFSUpdateDataFromOSM {
 		
 		Map<String, Integer> idWithVersion = new HashMap<String, Integer>();
 		for (Relation r:osmRels){
-			idWithVersion.put(r.getId(), r.version);
+			idWithVersion.put(r.getId(), r.getVersion());
 		}
 		
 		updateFullRels(idWithVersion);
@@ -110,7 +108,7 @@ public class GTFSUpdateDataFromOSM {
 		List<Stop> osmStops = OSMParser.readOSMStops(GTFSImportSetting.getInstance().getOSMPath() +  GTFSImportSetting.OSM_STOP_FILE_NAME);
 		Map<String, Stop> osmstopsOsmID = OSMParser.applyOSMIndex(osmStops);
 
-		Set<File> sorted = new HashSet<File>();
+		List<File> sorted = new ArrayList<File>();
 		
 		// Default to all available rel, then override forced updates
 		List<Relation> osmRels = OSMParser.readOSMRelations(new File(GTFSImportSetting.getInstance().getOSMCachePath() +  "tmp_rels.osm"), osmstopsOsmID);
@@ -127,10 +125,10 @@ public class GTFSUpdateDataFromOSM {
 			sorted.add(filesorted);
 			
 			if (!filesorted.exists() || OSMParser.readOSMRelations(filesorted, osmstopsOsmID).size() == 0 
-					|| OSMParser.readOSMRelations(filesorted, osmstopsOsmID).get(0).version < idWithVersion.get(relationId)){
+					|| OSMParser.readOSMRelations(filesorted, osmstopsOsmID).get(0).getVersion() < idWithVersion.get(relationId)){
 				File filerelation = new File(GTFSImportSetting.getInstance().getOSMCachePath() + "tmp_r" + relationId + ".osm");
 				if (!filerelation.exists() || OSMParser.readOSMRelations(filerelation, osmstopsOsmID).size() == 0
-						|| OSMParser.readOSMRelations(filerelation, osmstopsOsmID).get(0).version < idWithVersion.get(relationId)){
+						|| OSMParser.readOSMRelations(filerelation, osmstopsOsmID).get(0).getVersion() < idWithVersion.get(relationId)){
 					String url = GTFSImportSetting.OSM_API_SERVER + "relation/" + relationId + "/full";
 					DownloadUtils.downlod(url, filerelation);
 				}

@@ -62,10 +62,17 @@ public class StopsList {
 		return stops;
 	}
 	
+	public void setStops(Map<Long, Stop> s){
+		stops = s;
+	}
+	
 	public Map<Long, String> getStopsTime() {
 		return stopsTime;
 	}
-
+	
+	public void setStopsTime(Map<Long, String> s){
+		stopsTime = s;
+	}
 
 	public boolean equalsStops(StopsList o) {
 		if (stops.size() != o.stops.size())
@@ -77,13 +84,21 @@ public class StopsList {
 	}
 	
 	public int getStopsAffinity(StopsList o) {
+		boolean exactMatch = true;
 		int affinity = 0;
-		if (stops.size() == o.stops.size())
-			affinity += stops.size();
 		for (Stop s:stops.values())
-			if (o.stops.containsValue(s))
+			if (o.stops.containsValue(s)){
 				affinity+= stops.size() - Math.abs((getKeysByValue(stops, s) - getKeysByValue(o.stops, s)));
+			}else{
+				affinity -= stops.size();
+				exactMatch = false;
+			}
+		int diff = Math.abs(o.stops.size() - stops.size());
 		
+		if (exactMatch && diff == 0)
+			return Integer.MAX_VALUE;
+
+		affinity -= diff;
 		return affinity;
 	}
 	

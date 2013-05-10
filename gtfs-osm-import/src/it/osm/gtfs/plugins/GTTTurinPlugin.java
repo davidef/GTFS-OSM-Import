@@ -93,7 +93,10 @@ public class GTTTurinPlugin implements GTFSPlugin {
 	@Override
 	public boolean isValidTrip(Collection<Trip> allTrips, Set<Trip> uniqueTrips, Trip trip, StopsList s) {
 		int frequency = Collections.frequency(allTrips, trip);
-		if (frequency <= 1){
+
+		if (s.getStopsTime().get(new Long(1L)) == null)
+			return false;
+		else if (frequency <= 1){
 			System.err.println("GTTPlugin: Ignoring trip " + trip.getTripID() + " found only one, may not be a valid route");
 			return false;
 		}else if (frequency <= 4 && (s.getStopsTime().get(new Long(1L)).startsWith("04") || s.getStopsTime().get(new Long(1L)).startsWith("05") || s.getStopsTime().get(new Long(1L)).startsWith("06"))){

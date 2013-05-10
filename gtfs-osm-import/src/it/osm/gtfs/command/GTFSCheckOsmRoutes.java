@@ -47,7 +47,7 @@ public class GTFSCheckOsmRoutes {
 
 		//FIXME: handling first segment without forward/backward as backward
 		OSMNode previous = null;
-		for (OSMRelationWayMember m:r.wayMembers){
+		for (OSMRelationWayMember m:r.getWayMembers()){
 			if (previous != null){ 
 				if (m.backward == null){
 					if(previous.equals(m.way.nodes.get(m.way.nodes.size() - 1))){

@@ -17,7 +17,7 @@ package it.osm.gtfs.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Route {
+public class Route implements Comparable<Route> {
 	private String id;
 	private String shortName;
 	private String longName;
@@ -56,4 +56,18 @@ public class Route {
 	public void putShape(String id){
 		shapesIDs.add(id);
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other != null && other instanceof Route){
+			return ((Route)other).id.equals(id);
+		}
+		return false;
+	}
+
+	public int compareTo(Route route) {
+		return id.compareTo(route.id);
+	}
+	
+	
 }

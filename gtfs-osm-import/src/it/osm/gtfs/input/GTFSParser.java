@@ -95,11 +95,12 @@ public class GTFSParser {
 					}
 				}
 			}
-		} 
+		}
+		br.close();
 		return result;
 	}
 
-	public static List<Trip> readTrips(String fName, Map<String, StopsList> stopTimes) throws IOException{
+	public static List<Trip> readTrips(String fName, Map<String, Route> routes, Map<String, StopsList> stopTimes) throws IOException{
 		List<Trip> result = new ArrayList<Trip>();
 
 		String thisLine;
@@ -137,10 +138,12 @@ public class GTFSParser {
 				elements = thisLine.split(",");
 
 				if (elements[shape_id].length() > 0){
-					result.add(new Trip(elements[trip_id],elements[route_id],elements[shape_id], (trip_headsign > -1) ? elements[trip_headsign] : "", stopTimes.get(elements[trip_id])));
+					result.add(new Trip(elements[trip_id], routes.get(elements[route_id]), elements[shape_id],
+							(trip_headsign > -1) ? elements[trip_headsign] : "", stopTimes.get(elements[trip_id])));
 				}
 			}
-		} 
+		}
+		br.close();
 		return result;
 	}
 
@@ -191,6 +194,7 @@ public class GTFSParser {
 				}
 			}
 		} 
+		br.close();
 		return result;
 	}
 
@@ -234,7 +238,8 @@ public class GTFSParser {
 					result.put(elements[route_id], new Route(elements[route_id],elements[route_short_name],elements[route_long_name], elements[agency_id]));
 				}
 			}
-		} 
+		}
+		br.close();
 		return result;
 	}
 
@@ -297,7 +302,8 @@ public class GTFSParser {
 					}
 				}
 			}
-		} 
+		}
+		br.close();
 		if (missingStops.size() > 0)
 			System.err.println("Warning: Some stops weren't found, not all trip have been generated.");
 		return result;
@@ -307,7 +313,7 @@ public class GTFSParser {
 		Collections.sort(trips);
 		Multimap<String, Trip> result = ArrayListMultimap.create();
 		for (Trip t:trips){
-			Route r = routes.get(t.getRouteID());
+			Route r = routes.get(t.getRoute().getId());
 			StopsList s = stopTimes.get(t.getTripID());
 
 			if (s.isValid()){

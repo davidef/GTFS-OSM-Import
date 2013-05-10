@@ -4,16 +4,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Relation extends StopsList{
-	public String name;
-	public Integer version;
-	public String ref;
-	public String from;
-	public String to;
-	public RelationType type;
-	public List<OSMRelationWayMember> wayMembers = new ArrayList<Relation.OSMRelationWayMember>();
+	private String name;
+	private Integer version;
+	private String ref;
+	private String from;
+	private String to;
+	private RelationType type;
+	private List<OSMRelationWayMember> wayMembers = new ArrayList<Relation.OSMRelationWayMember>();
 
 	public Relation(String id) {
 		super(id);
+	}
+
+	public String getRef() {
+		return ref;
+	}
+
+	public void setRef(String ref) {
+		this.ref = ref;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public RelationType getType() {
+		return type;
+	}
+
+	public void setType(RelationType type) {
+		this.type = type;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+	public List<OSMRelationWayMember> getWayMembers() {
+		return wayMembers;
+	}
+
+	public void setWayMembers(List<OSMRelationWayMember> wayMembers) {
+		this.wayMembers = wayMembers;
 	}
 
 	public static enum RelationType{

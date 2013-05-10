@@ -49,7 +49,8 @@ public class GTFSGenerateRoutesDiff {
 
 		Map<String, Route> routes = GTFSParser.readRoutes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_ROUTES_FILE_NAME);
 		Map<String, StopsList> stopTimes = GTFSParser.readStopTimes(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_STOP_TIME_FILE_NAME, osmstopsGTFSId);
-		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_TRIPS_FILE_NAME, stopTimes);
+		List<Trip> trips = GTFSParser.readTrips(GTFSImportSetting.getInstance().getGTFSPath() +  GTFSImportSetting.GTFS_TRIPS_FILE_NAME,
+				routes, stopTimes);
 
 		//looking from mapping gtfs trip into existing osm relations
 		Set<Relation> osmRelationNotFoundInGTFS = new HashSet<Relation>(osmRels);
@@ -65,7 +66,7 @@ public class GTFSGenerateRoutesDiff {
 			Set<Trip> uniqueTrips = new HashSet<Trip>(allTrips);
 
 			for (Trip trip:uniqueTrips){
-				Route route = routes.get(trip.getRouteID());
+				Route route = routes.get(trip.getRoute().getId());
 				StopsList s = stopTimes.get(trip.getTripID());
 				if (GTFSImportSetting.getInstance().getPlugin().isValidTrip(allTrips, uniqueTrips, trip, s)){
 					if (GTFSImportSetting.getInstance().getPlugin().isValidRoute(route)){
@@ -105,11 +106,11 @@ public class GTFSGenerateRoutesDiff {
 
 		System.out.println("---");
 		for (Relation r:osmRelationFoundInGTFS){
-			System.out.println("Relation " + r.getId() + " (" + r.name + ") matched in GTFS ");
+			System.out.println("Relation " + r.getId() + " (" + r.getName() + ") matched in GTFS ");
 		}
 		System.out.println("---");
 		for (Trip t:tripsNotFoundInOSM){
-			System.out.println("Trip " + t.getTripID() + " (" + routes.get(t.getRouteID()).getShortName() + " - " + t.getName() + ") not found in OSM ");
+			System.out.println("Trip " + t.getTripID() + " (" + routes.get(t.getRoute().getId()).getShortName() + " - " + t.getName() + ") not found in OSM ");
 			StopsList stopGTFS = stopTimes.get(t.getTripID());
 			System.out.println("Progressivo \tGTFS\tOSM");
 			for (long f = 1; f <= stopGTFS.getStops().size() ; f++){
@@ -121,8 +122,8 @@ public class GTFSGenerateRoutesDiff {
 		for (Relation r:osmRelationNotFoundInGTFS){
 			System.out.println("---");
 			Affinity affinityGTFS = affinities.get(r);
-			System.out.println("Relation " + r.getId() + " (" + r.name + ") NOT matched in GTFS ");
-			System.out.println("Best match (" + affinityGTFS.affinity + "): id: " + affinityGTFS.trip.getTripID() + " " + routes.get(affinityGTFS.trip.getRouteID()).getShortName() + " " + affinityGTFS.trip.getName());
+			System.out.println("Relation " + r.getId() + " (" + r.getName() + ") NOT matched in GTFS ");
+			System.out.println("Best match (" + affinityGTFS.affinity + "): id: " + affinityGTFS.trip.getTripID() + " " + routes.get(affinityGTFS.trip.getRoute().getId()).getShortName() + " " + affinityGTFS.trip.getName());
 			StopsList stopGTFS = stopTimes.get(affinityGTFS.trip.getTripID());
 			StopsList stopOSM = r;
 			long max = Math.max(stopGTFS.getStops().size(), stopOSM.getStops().size());
@@ -130,7 +131,7 @@ public class GTFSGenerateRoutesDiff {
 			for (long f = 1; f <= max ; f++){
 				Stop gtfs= stopGTFS.getStops().get(new Long(f));
 				Stop osm = stopOSM.getStops().get(new Long(f));
-				System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + ((osm != null) ? osm.getCode() : "-") + ((gtfs != null) && (osm != null) &&  gtfs.getCode().equals(osm.getCode()) ? "" : "*"));
+				System.out.println("Stop # " + f + "\t" + ((gtfs != null) ? gtfs.getCode() : "-") + "\t" + ((osm != null) ? osm.getCode() : "-") + ((gtfs != null) && (osm != null) &&  gtfs.getCode().equals(osm.getCode()) ? "" : "*") + "\t" + ((osm != null) ? osm.getName() : "-"));
 			}
 		}
 		System.out.println("---");
