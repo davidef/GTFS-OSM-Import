@@ -44,7 +44,7 @@ public class GTFSParser {
 
 		String thisLine;
 		String [] elements;
-		int stopIdKey=-1, stopNameKey=-1, stopCodeKey=-1, stopLatKey=-1, stopLonKey=-1;
+		int stopIdKey=-1, stopNameKey=-1, stopCodeKey=-1, stopLatKey=-1, stopLonKey=-1, locationTypeKey=-1, parentStationKey=-1;
 
 		BufferedReader br = new BufferedReader(new FileReader(fName));
 		boolean isFirstLine = true;
@@ -60,6 +60,9 @@ public class GTFSParser {
 					else if(keys[i].equals("stop_lat")) stopLatKey = i;
 					else if(keys[i].equals("stop_lon")) stopLonKey = i;
 					else if(keys[i].equals("stop_code")) stopCodeKey = i;
+					else if(keys[i].equals("location_type")) locationTypeKey = i;
+					else if(keys[i].equals("parent_station")) parentStationKey = i;
+					
 					// gtfs stop_url is mapped to source_ref tag in OSM
 					else if(keys[i].equals("stop_url")){
 						keysIndex.put("source_ref", i);
@@ -93,9 +96,14 @@ public class GTFSParser {
 				if (stopCode.length() == 0)
 					stopCode = elements[stopIdKey];
 				if (stopCode.length() > 0){
-					GTFSStop gs = new GTFSStop(elements[stopIdKey],elements[stopCodeKey],Double.valueOf(elements[stopLatKey]),Double.valueOf(elements[stopLonKey]), elements[stopNameKey]);
-					if (GTFSImportSetting.getInstance().getPlugin().isValidStop(gs)){
-						result.add(gs);
+					if (locationTypeKey >= 0 && parentStationKey >= 0 && "1".equals(elements[locationTypeKey])){
+						//this is a station (group of multiple stops)	
+						System.err.println("skipped station (group of multiple stops): " + elements[stopIdKey]);
+					}else{
+						GTFSStop gs = new GTFSStop(elements[stopIdKey],elements[stopCodeKey],Double.valueOf(elements[stopLatKey]),Double.valueOf(elements[stopLonKey]), elements[stopNameKey]);
+						if (GTFSImportSetting.getInstance().getPlugin().isValidStop(gs)){
+							result.add(gs);
+						}
 					}
 				}else{
 					System.err.println("Failed to parse stops.txt line: " + thisLine);
