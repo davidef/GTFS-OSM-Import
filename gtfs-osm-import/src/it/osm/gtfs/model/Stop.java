@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-**/
+ **/
 package it.osm.gtfs.model;
 
 import it.osm.gtfs.output.IElementCreator;
@@ -35,7 +35,7 @@ public class Stop {
 	private Boolean isStopPosition = false;
 	public Stop paredWith;
 	public Node originalXMLNode;
-	
+
 	public Stop(String gtfsId, String code, Double lat, Double lon, String name) {
 		super();
 		this.gtfsId = gtfsId;
@@ -44,7 +44,7 @@ public class Stop {
 		this.lon = lon;
 		this.name = name;
 	}
-	
+
 	public String getGtfsId() {
 		return gtfsId;
 	}
@@ -69,7 +69,7 @@ public class Stop {
 	public String getOSMId(){
 		return (originalXMLNode == null) ? null : originalXMLNode.getAttributes().getNamedItem("id").getNodeValue();
 	}
-	
+
 
 	public void setIsRailway(Boolean isRailway){
 		this.isRailway = isRailway;
@@ -130,22 +130,27 @@ public class Stop {
 	}
 
 	public boolean seams(Stop os) {
-		if (os.getCode() != null && os.getCode().equals(getCode()))
-			//if less than 200m far away or already linked with gtfsid
+		if (os.getCode() != null && os.getCode().equals(getCode())){
 			if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 50 || 
-					(os.getGtfsId() != null && getGtfsId() != null && os.getGtfsId().equals(getGtfsId())))
+					(os.getGtfsId() != null && getGtfsId() != null && os.getGtfsId().equals(getGtfsId()))){
+				//if less than 50m far away or already linked with gtfsid
 				return true;
-			else if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 10000)
+			}else if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 10000){
 				System.err.println("Warning: Same ref with dist > 50 m (and less than 10km) [" + this + " -> " + os +  "]");
-		else
-			//if less than 5m far away and both don't have gtfsid or have the same (should never happen)
-			if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 5 && 
-					((os.getGtfsId() == null && getGtfsId() == null) || 
-					 (os.getGtfsId() != null && getGtfsId() != null && os.getGtfsId().equals(getGtfsId()))))
-				return true;
+			}else{
+				if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 5 && os.getGtfsId() == null && getGtfsId() == null){
+					//if less than 5m far away and both don't have gtfsid
+					return true;
+				}	
+			}
+		}else if (OSMDistanceUtils.distVincenty(getLat(), getLon(), os.getLat(), os.getLon()) < 50 && os.getGtfsId() != null && getGtfsId() != null && os.getGtfsId().equals(getGtfsId())){
+			//if have same gtfsid and are less than 50m far away and both don't have gtfsid
+			System.err.println("Warning: Different ref matched by gtfs_id [" + this + " -> " + os +  "]");
+			return true;
+		}
 		return false;
 	}
-	
+
 	public Element getNewXMLNode(IElementCreator document){
 		Element node = document.createElement("node");
 		Long id;
@@ -170,15 +175,15 @@ public class Stop {
 		node.appendChild(OSMXMLUtils.createTagElement(document, "gtfs_id", getGtfsId()));
 		return node;
 	}
-	
-	
+
+
 	public static class GTFSStop extends Stop{
 		public Stop paredWithRailWay;
 		public List<Stop> paredWithStopPositions = new ArrayList<Stop>();
-		
+
 		public GTFSStop(String gtfsId, String code, Double lat, Double lon, String name) {
 			super(gtfsId, code, lat, lon, name);
 		}
-		
+
 	}
 }
