@@ -194,8 +194,9 @@ public class OSMParser {
 		}
 
 
-		if (relationParser.missingNodes.size() > 0){
-			throw new IllegalArgumentException("Failed to parse some relations. Missing nodes: " + StringUtils.join(relationParser.missingNodes, ", "));
+		if (relationParser.missingNodes.size() > 0 || relationParser.failedRelationIds.size() > 0){
+			System.err.println("Failed to parse some relations. Relations id: " + StringUtils.join(relationParser.failedRelationIds, ", "));
+			System.err.println("Failed to parse some relations. Missing nodes: " + StringUtils.join(relationParser.missingNodes, ", "));
 		}
 
 		return relationParser.result;
@@ -268,6 +269,7 @@ public class OSMParser {
 		private Map<Long, OSMWay> ways;
 
 		private List<Relation> result = new ArrayList<Relation>();
+		private List<String> failedRelationIds = new ArrayList<String>();
 		private List<String> missingNodes = new ArrayList<String>();
 
 		private Relation currentRelation;
@@ -336,7 +338,12 @@ public class OSMParser {
 				else if (key.equals("to"))
 					currentRelation.setTo(attributes.getValue("v"));
 				else if (key.equals("route"))
-					currentRelation.setType(RelationType.parse(attributes.getValue("v")));
+					try{
+						currentRelation.setType(RelationType.parse(attributes.getValue("v")));
+					}catch (IllegalArgumentException e){
+						System.err.println(e.getMessage());
+						failed = true;
+					}
 			}
 		}
 
@@ -347,6 +354,7 @@ public class OSMParser {
 				if (!failed){
 					result.add(currentRelation);
 				}else{
+					failedRelationIds.add(currentRelation.getId());
 					System.err.println("Warning: failed to parse relation " + currentRelation.getId() + " " + currentRelation.getName());
 				}
 				currentRelation = null;

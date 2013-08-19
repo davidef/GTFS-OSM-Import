@@ -88,11 +88,17 @@ public class GTFSParser {
 				}
 				elements = thisLine.split(",");
 
-				if (elements[stopCodeKey].length() > 0){
+				//GTFS Milano: code column present but empty (using id as code)
+				String stopCode = elements[stopCodeKey];
+				if (stopCode.length() == 0)
+					stopCode = elements[stopIdKey];
+				if (stopCode.length() > 0){
 					GTFSStop gs = new GTFSStop(elements[stopIdKey],elements[stopCodeKey],Double.valueOf(elements[stopLatKey]),Double.valueOf(elements[stopLonKey]), elements[stopNameKey]);
 					if (GTFSImportSetting.getInstance().getPlugin().isValidStop(gs)){
 						result.add(gs);
 					}
+				}else{
+					System.err.println("Failed to parse stops.txt line: " + thisLine);
 				}
 			}
 		}

@@ -73,7 +73,7 @@ public class Relation extends StopsList{
 	}
 
 	public static enum RelationType{
-		SUBWAY(0), TRAM(1), BUS(2), TRAIN(3); 
+		SUBWAY(0), TRAM(1), BUS(2), TRAIN(3), LIGHT_RAIL(4); 
 
 		private int dbId;
 		private RelationType(int dbId){
@@ -90,6 +90,8 @@ public class Relation extends StopsList{
 					return SUBWAY;
 				if (nodeValue.equalsIgnoreCase("train"))
 					return TRAIN;
+				if (nodeValue.equalsIgnoreCase("light_rail"))
+					return LIGHT_RAIL;
 			}
 			throw new IllegalArgumentException("unsupported relation type: " + nodeValue);
 		}
